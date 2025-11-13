@@ -12,6 +12,7 @@ class Listing(BaseModel):
     distance_km: int
     date: datetime
     images: List[HttpUrl] = []
+    games_llm: List[str] = []
 
     def __str__(self):
         return self.model_dump_json(indent=2)

@@ -1,4 +1,5 @@
 from config import settings
+from llm import TogetherLLM
 from scraper import fetch_listings
 
 def main():
@@ -15,6 +16,8 @@ def main():
     )
 
     for listing in listings:
+        llm = TogetherLLM()
+        listing.games_llm = llm.extract_names(title=listing.title, description=listing.description)
         print(listing)
 
 if __name__ == "__main__":
