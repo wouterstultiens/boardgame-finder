@@ -21,5 +21,15 @@ class Listing(BaseModel):
     images: List[HttpUrl] = Field(default_factory=list)
     games: List[Game] = Field(default_factory=list)
 
+    def extract_games(self, llm) -> None:
+        """
+        Fills `self.games.llm_name` using an LLM.
+        """
+        names = llm.extract_names(
+            title=self.title,
+            description=self.description
+        )
+        self.games = [Game(llm_name=name) for name in names]
+
     def __str__(self):
         return self.model_dump_json(indent=2)
