@@ -1,9 +1,6 @@
 from datetime import datetime
 from typing import List
-from pydantic import BaseModel, Field, HttpUrl
-
-class ListingImage(BaseModel):
-    url: HttpUrl
+from pydantic import BaseModel, HttpUrl
 
 class Listing(BaseModel):
     title: str
@@ -14,7 +11,7 @@ class Listing(BaseModel):
     city: str
     distance: int
     date: datetime
-    images: List[ListingImage] = Field(default_factory=list)
+    images: List[HttpUrl] = []
 
-    def __repr__(self):
+    def __str__(self):
         return self.model_dump_json(indent=2)

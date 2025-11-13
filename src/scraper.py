@@ -1,37 +1,20 @@
 from typing import List
 from marktplaats import SearchQuery, SortBy, SortOrder, category_from_name
 
-from models import Listing, ListingImage
+from models import Listing
 
 def _to_listing_data(listing) -> Listing:
-    # Robust against missing fields in the lib
-    images = []
-    for img in listing.get_images():
-        images.append(ListingImage(url=str(img)))
-
-    city = None
-    distance = None
-    try:
-        city = listing.location.city
-        distance = int(getattr(listing.location, "distance", None) or 0)
-    except Exception:
-        pass
-
-    seller_name = None
-    try:
-        seller_name = listing.seller.name
-    except Exception:
-        pass
+    images = [str(img) for img in listing.get_images()]
 
     return Listing(
-        title=str(getattr(listing, "title", "")),
-        description=str(getattr(listing, "description", "")),
-        price=float(getattr(listing, "price", 0.0) or 0.0),
-        price_type=str(getattr(listing, "price_type", None)),
-        link=str(getattr(listing, "link", "")),
-        city=city,
-        distance=distance,
-        date=getattr(listing, "date", None),
+        title=str(listing.title),
+        description=str(listing.description),
+        price=float(listing.price),
+        price_type=str(listing.price_type),
+        link=str(listing.link),
+        city=listing.location.city,
+        distance=int(listing.location.distance),
+        date=listing.date,
         images=images,
     )
 
