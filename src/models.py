@@ -1,12 +1,33 @@
 from datetime import datetime
+from turtle import st
 from typing import List, Optional
 from pydantic import BaseModel, HttpUrl
 from pydantic import Field
 
+class BGGData(BaseModel):
+    id: str
+    name: str
+    description: str
+    year_published: int
+    weight: float
+    rating: float
+
 
 class Game(BaseModel):
     llm_name: str
-    bgg_name: Optional[str] = None
+    bgg_name: List[BGGData] = Field(default_factory=list)
+
+    def apply_bgg_row(self, row):
+        self.bgg_name.append(
+            BGGData(
+                id=str(row["BGGId"]),
+                name=row["Name"],
+                description=row["Description"],
+                year_published=int(row["YearPublished"]),
+                weight=float(row["GameWeight"]),
+                rating=float(row["AvgRating"]),
+            )
+        )
 
 
 class Listing(BaseModel):
