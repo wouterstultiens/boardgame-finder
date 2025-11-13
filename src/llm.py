@@ -18,14 +18,40 @@ class TogetherLLM(BaseLLM):
 
     def extract_names(self, title: str, description: str) -> List[str]:
         prompt = f"""
-        Return ONLY JSON: an array of distinct board game titles detected in the text.
-        Prefer canonical names as listed on BoardGameGeek.
-        If no board games are present, return [].
+        You are an extractor that returns ONLY valid JSON arrays of board game titles.
 
-        Text title:
+        Your task:
+        - Detect board game titles inside the provided text (title + description).
+        - Prefer canonical BoardGameGeek names.
+        - If none are found, return [].
+        - IMPORTANT: Output must be *only* a JSON array. No explanation.
+
+        Examples:
+
+        Input:
+        Title: "Kolonisten te koop!"
+        Description: "Complete set van Catan met uitbreiding Zeerovers."
+        Output:
+        ["Catan", "Catan: Seafarers"]
+
+        Input:
+        Title: "Games bundle"
+        Description: " Monopoly, Risk, and a puzzle included."
+        Output:
+        ["Monopoly", "Risk"]
+
+        Input:
+        Title: "Boeken te koop"
+        Description: "Romans, thrillers, geen spellen."
+        Output:
+        []
+
+        Now extract games from the following listing:
+
+        Title:
         {title}
 
-        Text description:
+        Description:
         {description}
         """
         resp = self.client.chat.completions.create(
