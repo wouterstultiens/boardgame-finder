@@ -1,7 +1,4 @@
 # src/processing.py
-from typing import List
-import pandas as pd
-
 from models import Listing, Game, BGGData
 from llm import BaseLLM
 from bgg import NameMatcher 
@@ -34,11 +31,9 @@ class ListingProcessor:
 
     def _match_bgg_data(self, game: Game) -> None:
         """Matches the LLM name to BGG data and adds it to the Game object."""
-        # row will be pd.Series or None
         row = self.bgg_matcher.match_name(game.llm_name) 
 
         if row is not None:
-            # Logic previously in Game.apply_bgg_row()
             bgg_data = BGGData(
                 id=str(row["BGGId"]),
                 name=row["Name"],
@@ -47,5 +42,4 @@ class ListingProcessor:
                 weight=float(row["GameWeight"]),
                 rating=float(row["AvgRating"]),
             )
-            # The field is now named bgg_data
             game.bgg_data.append(bgg_data)
