@@ -30,8 +30,7 @@ def _to_listing_data(listing) -> Listing:
         price_type=str(getattr(listing, "price_type", None)),
         link=str(getattr(listing, "link", "")),
         city=city,
-        distance_m=distance,
-        seller_name=seller_name,
+        distance=distance,
         date=getattr(listing, "date", None),
         images=images,
     )
