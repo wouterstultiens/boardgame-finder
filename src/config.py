@@ -8,9 +8,8 @@ class Settings(BaseSettings):
     marktplaats_category_name: str
 
     # LLM
-    llm_enabled: bool = True
-    together_api_key: str | None = None
-    llm_model: str = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"
+    together_api_key: str
+    together_llm_model: str
 
     # BGG
     bgg_enabled: bool
