@@ -1,7 +1,7 @@
 from typing import List
 from marktplaats import SearchQuery, SortBy, SortOrder, category_from_name
 
-from src.models import Listing, ListingImage
+from models import Listing, ListingImage
 
 def _to_listing_data(listing) -> Listing:
     # Robust against missing fields in the lib
