@@ -6,18 +6,41 @@ import pandas as pd
 
 COLS = ["BGGId", "Name", "Description", "YearPublished", "GameWeight", "AvgRating"]
 
+# load_bgg function is removed
 
-def load_bgg(path: str = "bgg_data/games.csv") -> pd.DataFrame:
-    return pd.read_csv(path)[COLS]
+# --- Repository Abstraction (New) ---
 
+class BGGRepository(ABC):
+    """
+    Abstract class for fetching BGG data, decoupling data access.
+    """
+    @abstractmethod
+    def get_all_games(self) -> pd.DataFrame:
+        ...
+
+class BGGFileRepository(BGGRepository):
+    """
+    Concrete implementation that loads data from a local CSV file.
+    """
+    def __init__(self, path: str = "bgg_data/games.csv"):
+        self._path = path
+        self._df = None
+
+    def get_all_games(self) -> pd.DataFrame:
+        if self._df is None:
+            self._df = pd.read_csv(self._path)[COLS]
+        return self._df
+        
+# --- Matcher Classes (Modified) ---
 
 class NameMatcher(ABC):
     """
     Abstract matcher: can be implemented with fuzzy, embeddings, etc.
+    Now takes a BGGRepository dependency.
     """
 
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
+    def __init__(self, repository: BGGRepository): # Changed dependency
+        self.df = repository.get_all_games() # Load the data via the repo
 
     @abstractmethod
     def match_name(self, name: str) -> Optional[pd.Series]:
@@ -32,10 +55,11 @@ class FuzzyNameMatcher(NameMatcher):
     Very simple fuzzy matcher using difflib.
     """
 
-    def __init__(self, df: pd.DataFrame, cutoff: float = 0.6):
-        super().__init__(df)
+    # Constructor now takes the repository
+    def __init__(self, repository: BGGRepository, cutoff: float = 0.6): 
+        super().__init__(repository) # Pass repo to parent
         self.cutoff = cutoff
-        self._names = df["Name"].astype(str).tolist()
+        self._names = self.df["Name"].astype(str).tolist()
 
     def match_name(self, name: str) -> Optional[pd.Series]:
         best = difflib.get_close_matches(

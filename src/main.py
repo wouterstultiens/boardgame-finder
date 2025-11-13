@@ -2,11 +2,12 @@ from config import settings
 from llm import TogetherLLM
 from scraper import fetch_listings
 
-from bgg import load_bgg, FuzzyNameMatcher
+from bgg import BGGFileRepository, FuzzyNameMatcher
+from processing import ListingProcessor 
 
 
 def main():
-    # 1. Fetch listings from Marktplaats
+    # --- 1. Data retrieval ---
     listings = fetch_listings(
         zip_code=settings.zip_code,
         distance_km=settings.distance_km,
@@ -14,28 +15,20 @@ def main():
         category_name=settings.marktplaats_category_name
     )
 
-    # 2. Init LLM
+    # --- 2. Services ---
     llm = TogetherLLM(
         api_key=settings.together_api_key,
         model=settings.together_llm_model
     )
+    bgg_repo = BGGFileRepository() # Create the repository
+    matcher = FuzzyNameMatcher(bgg_repo) # Pass repo dependency to matcher
+    processor = ListingProcessor(llm=llm, bgg_matcher=matcher)
 
-    # 3. Load BGG data + matcher
-    bgg_df = load_bgg()
-    matcher = FuzzyNameMatcher(bgg_df)
-
-    # 4. Process listings
+    # --- 3. Execution ---
     for listing in listings:
-        # Extract game names via LLM
-        listing.extract_games(llm)
-
-        # Match each extracted name to BGG
-        for game in listing.games:
-            row = matcher.match_name(game.llm_name)
-            if row is not None:
-                game.apply_bgg_row(row)
-
-        print(listing)
+        enriched_listing = processor.enrich_listing(listing)
+        
+        print(enriched_listing) 
 
 
 if __name__ == "__main__":
