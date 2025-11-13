@@ -14,9 +14,8 @@ def main():
         category_name=marktplaats_category_name
     )
 
-
-
-    print(listings[0])
+    for listing in listings:
+        print(listing)
 
 if __name__ == "__main__":
     main()

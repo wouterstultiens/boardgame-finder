@@ -9,7 +9,7 @@ class Listing(BaseModel):
     price_type: str
     link: HttpUrl
     city: str
-    distance: int
+    distance_km: int
     date: datetime
     images: List[HttpUrl] = []
 

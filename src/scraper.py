@@ -13,7 +13,7 @@ def _to_listing_data(listing) -> Listing:
         price_type=str(listing.price_type),
         link=str(listing.link),
         city=listing.location.city,
-        distance=int(listing.location.distance),
+        distance_km=int(listing.location.distance/1000),
         date=listing.date,
         images=images,
     )
