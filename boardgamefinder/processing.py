@@ -35,9 +35,8 @@ class ListingProcessor:
 
         if row is not None:
             bgg_data = BGGData(
-                id=str(row["BGGId"]),
+                link=f"https://boardgamegeek.com/boardgame/{str(row["BGGId"])}",
                 name=row["Name"],
-                description=row["Description"],
                 year_published=int(row["YearPublished"]),
                 weight=float(row["GameWeight"]),
                 rating=float(row["AvgRating"]),

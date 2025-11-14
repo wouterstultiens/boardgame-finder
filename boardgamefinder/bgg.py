@@ -4,7 +4,7 @@ from typing import Optional
 
 import pandas as pd
 
-COLS = ["BGGId", "Name", "Description", "YearPublished", "GameWeight", "AvgRating"]
+COLS = ["BGGId", "Name", "YearPublished", "GameWeight", "AvgRating", "ImagePath"]
 
 
 # --- Repository Abstraction ---

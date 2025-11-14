@@ -5,3 +5,4 @@ bgg_data/
 .idea/
 .env
 boardgamefinder.egg-info/
+*.log

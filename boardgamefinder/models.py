@@ -4,9 +4,8 @@ from pydantic import BaseModel, HttpUrl
 from pydantic import Field
 
 class BGGData(BaseModel):
-    id: str
+    link: HttpUrl
     name: str
-    description: str
     year_published: int
     weight: float
     rating: float
