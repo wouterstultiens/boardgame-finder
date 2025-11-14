@@ -1,8 +1,10 @@
 # src/extractors.py
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Dict, Any
 import json
+
 from llm_client import LLM, Message
+from prompts import GAME_EXTRACT_SYSTEM
 
 
 class NameExtractor(ABC):
@@ -16,20 +18,36 @@ class JsonNameExtractor(NameExtractor):
         self.client = client
 
     @staticmethod
-    def _parse_json(raw_message: str):
-        try:
-            return [str(x).strip() for x in json.loads(raw_message) if str(x).strip()]
-        except json.JSONDecodeError:
-            return [f"Error decoding JSON: {raw_message}"]
+    def _normalize_items(items: Any) -> List[Dict[str, str]]:
+        """
+        Normalizes LLM output into a list of {"name": str, "lang": str}.
+        """
+        out: List[Dict[str, str]] = []
 
-    def extract(self, title: str, description: str) -> List[str]:
+        for x in items:
+            name = str(x.get("name", "")).strip()
+            lang = str(x.get("lang", "unknown")).strip().lower()
+
+            out.append({"name": name, "lang": lang})
+
+        return out
+
+    @staticmethod
+    def _parse_json(raw_message: str) -> List[Dict[str, str]]:
+        try:
+            data = json.loads(raw_message)
+        except json.JSONDecodeError:
+            # Return empty on invalid JSON to fail safely
+            return []
+        return JsonNameExtractor._normalize_items(data)
+
+    def extract(self, title: str, description: str) -> List[Dict[str, str]]:
         messages = [
-            Message("system", "Return ONLY a JSON array of board game titles. If none, return []."),
-            Message("user", f"Title: {title}\nDescription: {description}")
+            Message("system", GAME_EXTRACT_SYSTEM),
+            Message("user", f"Title:\n{title}\n\nDescription:\n{description}")
         ]
         raw = self.client.get_response(messages)
-        names = self._parse_json(raw)
-        return names
+        return self._parse_json(raw)
 
 
 # --- Factory ---

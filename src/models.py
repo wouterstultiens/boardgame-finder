@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Literal
 from pydantic import BaseModel, HttpUrl
 from pydantic import Field
 
@@ -14,7 +14,8 @@ class BGGData(BaseModel):
 
 class Game(BaseModel):
     llm_name: str
-    bgg_data: List[BGGData] = Field(default_factory=list) 
+    llm_lang: Literal['nl', 'en', 'unknown']
+    bgg_data: List[BGGData] = Field(default_factory=list)
 
 
 class Listing(BaseModel):

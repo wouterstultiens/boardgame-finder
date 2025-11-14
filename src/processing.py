@@ -16,12 +16,12 @@ class ListingProcessor:
         """
         Orchestrates the extraction of game names and matching with BGG data.
         """
-        # 1. Extract game names
-        game_names = self.name_extractor.extract(
+        # 1. Extract game names (+ language)
+        extracted = self.name_extractor.extract(
             title=listing.title,
             description=listing.description
         )
-        listing.games = [Game(llm_name=name) for name in game_names]
+        listing.games = [Game(llm_name=item["name"], llm_lang=item["lang"]) for item in extracted]
 
         # 2. Match each game with BGG data
         for game in listing.games:
