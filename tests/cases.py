@@ -48,7 +48,7 @@ TEST_CASES: List[PromptTestCase] = [
         expected=[{"name": "Land in Zicht", "lang": "nl"}],
     ),
     PromptTestCase(
-        name="nl_stratego_scifi",
+        name="en_stratego_scifi",
         title="Stratego Sci-Fi",
         description="Een variant op het bekende bordspel stratego: scifi editie. Het spel is compleet en de onderdelen zijn in keurige nette staat. De ",
         expected=[{"name": "Stratego Sci-Fi", "lang": "en"}],
