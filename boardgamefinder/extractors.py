@@ -47,6 +47,7 @@ class JsonNameExtractor(NameExtractor):
             Message("user", f"Title:\n{title}\n\nDescription:\n{description}")
         ]
         raw = self.client.get_response(messages)
+        print(f"\nMESSAGES\n{messages}\n\nRESPONSE\n{raw}")
         return self._parse_json(raw)
 
 
