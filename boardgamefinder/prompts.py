@@ -33,6 +33,11 @@ Rules for "lang":
 - Use "en" if the edition or title is clearly English or internationally English-first.
 - Use "unknown" only when the language cannot be confidently determined.
 
+Normalize the name:
+  - Combine fragmented OCR words into one line.
+  - Use normal capitalization (e.g., "Party & Co", not all caps).
+  - Remove extra whitespace or line breaks.
+
 Formatting:
 - Return a valid JSON array.
 - No explanations, comments, or surrounding text.
