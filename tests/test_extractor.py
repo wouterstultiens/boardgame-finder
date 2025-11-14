@@ -78,6 +78,8 @@ def run() -> List[Dict[str, object]]:
         results.append(
             {
                 "case": case.name,
+                "title": case.title,
+                "description": case.description,  
                 "passed": passed,
                 "score": score,
                 "expected": case.expected,
@@ -97,8 +99,10 @@ def run() -> List[Dict[str, object]]:
     for r in results:
         status = "✅ PASS" if r["passed"] else "❌ FAIL"
         print(f"{status} {r['case']} (score={r['score']:.3f})")
-        print("  expected:", json.dumps(r["expected"], ensure_ascii=False))
-        print("  actual  :", json.dumps(r["actual"], ensure_ascii=False))
+        print(f"  title    : {r['title']}")         # 👈 added
+        print(f"  desc     : {r['description']}")   # 👈 added
+        print("  expected :", json.dumps(r["expected"], ensure_ascii=False))
+        print("  actual   :", json.dumps(r["actual"], ensure_ascii=False))
         print()
 
     return results
