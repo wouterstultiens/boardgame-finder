@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     zip_code: str
     distance_km: int
     max_listings: int
-    offset: int
     marktplaats_category_name: str
 
     # LLM provider
