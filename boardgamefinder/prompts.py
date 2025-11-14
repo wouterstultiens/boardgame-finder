@@ -30,4 +30,8 @@ OUTPUT EXAMPLES
   {"name": "Catan: Zeevaarders", "lang": "nl"},
   {"name": "Ticket to Ride: Europe", "lang": "en"}
 ]
+
+[
+  {"name": "", "lang": "unknown"}
+]
 """
