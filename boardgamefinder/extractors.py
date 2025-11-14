@@ -43,7 +43,6 @@ class JsonNameExtractor(NameExtractor):
             Message("system", GAME_EXTRACT_SYSTEM),
             Message("user", f"Title:\n{title}\n\nDescription:\n{description}\n\nImage texts (OCR Results):\n{image_text_block}")
         ]
-        print(messages[1]['content'])
         raw = self.client.get_response(messages)
         return self._parse_json(raw)
 
