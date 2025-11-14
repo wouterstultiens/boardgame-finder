@@ -4,3 +4,4 @@ __pycache__/
 bgg_data/
 .idea/
 .env
+boardgamefinder.egg-info/

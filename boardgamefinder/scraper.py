@@ -1,7 +1,7 @@
 from typing import List
 from marktplaats import SearchQuery, SortBy, SortOrder, category_from_name
 
-from models import Listing
+from .models import Listing
 
 def _to_listing_data(listing) -> Listing:
     images = [str(img) for img in listing.get_images()]

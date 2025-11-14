@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 import json
 
-from llm_client import LLM, Message
-from prompts import GAME_EXTRACT_SYSTEM
+from .llm_client import LLM, Message
+from .prompts import GAME_EXTRACT_SYSTEM
 
 
 class NameExtractor(ABC):

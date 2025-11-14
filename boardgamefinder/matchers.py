@@ -4,7 +4,7 @@ from typing import Optional
 
 import pandas as pd
 
-from bgg import BGGRepository
+from .bgg import BGGRepository
 
 
 class NameMatcher(ABC):

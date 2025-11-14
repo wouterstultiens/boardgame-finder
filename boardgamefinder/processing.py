@@ -1,7 +1,7 @@
 # src/processing.py
-from models import Listing, Game, BGGData
-from matchers import NameMatcher
-from extractors import NameExtractor
+from .models import Listing, Game, BGGData
+from .matchers import NameMatcher
+from .extractors import NameExtractor
 
 class ListingProcessor:
     """

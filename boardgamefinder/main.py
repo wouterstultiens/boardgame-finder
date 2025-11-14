@@ -1,13 +1,13 @@
 # src/main.py
-from config import settings
-from scraper import fetch_listings
+from .config import settings
+from .scraper import fetch_listings
 
-from bgg import make_bgg_repository
-from matchers import make_name_matcher
-from processing import ListingProcessor
+from .bgg import make_bgg_repository
+from .matchers import make_name_matcher
+from .processing import ListingProcessor
 
-from extractors import make_name_extractor
-from llm_client import make_llm
+from .extractors import make_name_extractor
+from .llm_client import make_llm
 
 
 def main():

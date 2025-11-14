@@ -7,7 +7,7 @@ import together
 from azure.identity import DefaultAzureCredential
 from openai import AzureOpenAI
 
-from config import settings
+from .config import settings
 
 
 class Message(dict):
