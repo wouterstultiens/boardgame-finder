@@ -1,4 +1,5 @@
 # src/main.py
+from boardgamefinder.storage import get_listing_by_link, save_listing
 from .config import settings
 from .scraper import fetch_listings
 
@@ -36,11 +37,14 @@ def main():
 
     processor = ListingProcessor(name_extractor=name_extractor, bgg_matcher=matcher)
 
-    # --- 3. Execution ---
     for listing in listings:
-        enriched_listing = processor.enrich_listing(listing)
-        print(enriched_listing)
+        url = str(listing.link)
 
+        cached = get_listing_by_link(url)
+        if cached and cached.games:
+            enriched = cached
+        else:
+            enriched = processor.enrich_listing(listing)
+            save_listing(enriched)
 
-if __name__ == "__main__":
-    main()
+        print(enriched)

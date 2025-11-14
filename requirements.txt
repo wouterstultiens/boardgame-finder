@@ -13,3 +13,6 @@ ragas
 
 # Image recognition
 google-cloud-vision
+
+# Storage
+google-cloud-firestore

@@ -25,9 +25,6 @@ class Settings(BaseSettings):
     # Extraction selection
     extraction_method: Literal["json"]
 
-    # Matching selection
-    matching_method: Literal["fuzzy", "echo"]
-
     # BGG
     bgg_repo: Literal["file", "dummy"]
     bgg_min_rating: float
@@ -35,5 +32,11 @@ class Settings(BaseSettings):
     bgg_max_weight: float
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    # Matching selection
+    matching_method: Literal["fuzzy", "echo"]
+
+    # Google App Credentials
+    google_application_credentials: str
 
 settings = Settings()
