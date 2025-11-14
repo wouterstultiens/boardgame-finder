@@ -1,7 +1,8 @@
-# src/processing.py
+# boardgamefinder/processing.py
 from .models import Listing, Game, BGGData
 from .matchers import NameMatcher
 from .extractors import NameExtractor
+from .ocr import extract_text_from_image_urls
 
 class ListingProcessor:
     """
@@ -16,14 +17,17 @@ class ListingProcessor:
         """
         Orchestrates the extraction of game names and matching with BGG data.
         """
-        # 1. Extract game names (+ language)
+        # 1. Extract text from images
+        listing.image_texts = extract_text_from_image_urls(listing.images)
+
+        # 2. Extract game names (+ language) using title, description, and image texts
         extracted = self.name_extractor.extract(
             title=listing.title,
             description=listing.description
         )
         listing.games = [Game(llm_name=item["name"], llm_lang=item["lang"]) for item in extracted]
 
-        # 2. Match each game with BGG data
+        # 3. Match each game with BGG data
         for game in listing.games:
             self._match_bgg_data(game)
 
@@ -35,7 +39,7 @@ class ListingProcessor:
 
         if row is not None:
             bgg_data = BGGData(
-                link=f"https://boardgamegeek.com/boardgame/{str(row["BGGId"])}",
+                link=f"https://boardgamegeek.com/boardgame/{str(row['BGGId'])}",
                 name=row["Name"],
                 year_published=int(row["YearPublished"]),
                 weight=float(row["GameWeight"]),

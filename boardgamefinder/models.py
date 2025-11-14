@@ -27,6 +27,7 @@ class Listing(BaseModel):
     distance_km: int
     date: datetime
     images: List[HttpUrl] = Field(default_factory=list)
+    image_texts: List[str] = Field(default_factory=list)
     games: List[Game] = Field(default_factory=list)
 
     def __str__(self):
