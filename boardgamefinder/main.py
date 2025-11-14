@@ -12,12 +12,12 @@ from .llm_client import make_llm
 
 
 def main():
+    print('start')
     # --- 1. Data retrieval ---
     listings = fetch_listings(
         zip_code=settings.zip_code,
         distance_km=settings.distance_km,
         limit=settings.max_listings,
-        offset=settings.offset,
         category_name=settings.marktplaats_category_name
     )
 
@@ -38,12 +38,15 @@ def main():
     processor = ListingProcessor(name_extractor=name_extractor, bgg_matcher=matcher)
 
     for listing in listings:
+        print('go')
         url = str(listing.link)
 
         cached = get_listing_by_link(url)
         if cached and cached.games:
+            print('cached')
             enriched = cached
         else:
+            print('not cached')
             enriched = processor.enrich_listing(listing)
             save_listing(enriched)
 

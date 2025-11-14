@@ -52,13 +52,11 @@ def fetch_listings(
     distance_km: int,
     category_name: str,
     limit: int,
-    offset: int,
 ) -> List[Listing]:
     search = SearchQuery(
         zip_code=zip_code,
         distance=distance_km * 1000,
         limit=limit,
-        offset=offset,
         sort_by=SortBy.DATE,
         sort_order=SortOrder.DESC,
         category=category_from_name(category_name),
