@@ -103,6 +103,7 @@ def run() -> List[Dict[str, object]]:
         print(f"{status} {r['case']} (score={r['score']:.3f})")
         print(f"  title    : {r['title']}")         # 👈 added
         print(f"  desc     : {r['description']}")   # 👈 added
+        print(f"image_texts: {r['image_texts']}")
         print("  expected :", json.dumps(r["expected"], ensure_ascii=False))
         print("  actual   :", json.dumps(r["actual"], ensure_ascii=False))
         print()
