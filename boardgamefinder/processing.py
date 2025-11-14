@@ -23,7 +23,8 @@ class ListingProcessor:
         # 2. Extract game names (+ language) using title, description, and image texts
         extracted = self.name_extractor.extract(
             title=listing.title,
-            description=listing.description
+            description=listing.description,
+            image_texts=listing.image_texts
         )
         listing.games = [Game(llm_name=item["name"], llm_lang=item["lang"]) for item in extracted]
 

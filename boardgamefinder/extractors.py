@@ -9,7 +9,7 @@ from .prompts import GAME_EXTRACT_SYSTEM
 
 class NameExtractor(ABC):
     @abstractmethod
-    def extract(self, title: str, description: str) -> List[str]:
+    def extract(self, title: str, description: str, image_texts: List[str]) -> List[str]:
         ...
 
 
@@ -35,11 +35,15 @@ class JsonNameExtractor(NameExtractor):
         except:
             return []
 
-    def extract(self, title: str, description: str) -> List[Dict[str, str]]:
+    def extract(self, title: str, description: str, image_texts: List[str]) -> List[Dict[str, str]]:
+        image_text_block = "\n\n".join(
+            [f"--- OCR Result for Image {i+1} ---\n{text}" for i, text in enumerate(image_texts)]
+        )
         messages = [
             Message("system", GAME_EXTRACT_SYSTEM),
-            Message("user", f"Title:\n{title}\n\nDescription:\n{description}")
+            Message("user", f"Title:\n{title}\n\nDescription:\n{description}\n\nImage texts (OCR Results):\n{image_text_block}")
         ]
+        print(messages[1]['content'])
         raw = self.client.get_response(messages)
         return self._parse_json(raw)
 
