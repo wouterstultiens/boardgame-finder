@@ -9,10 +9,18 @@ class Settings(BaseSettings):
     max_listings: int
     marktplaats_category_name: str
 
-    # LLM selection
+    # LLM provider
     llm_provider: Literal["azure", "together"]
+
+    # Together LLM
     together_api_key: Optional[str]
     together_llm_model: Optional[str]
+
+    # Azure LLM
+    ssl_cert_file: Optional[str]
+    azure_client_id: Optional[str]
+    azure_tenant_id: Optional[str]
+    azure_client_secret: Optional[str]
 
     # Extraction selection
     extraction_method: Literal["json"]

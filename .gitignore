@@ -3,3 +3,4 @@ __pycache__/
 *.xml
 bgg_data/
 .idea/
+.env

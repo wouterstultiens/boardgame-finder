@@ -1,10 +1,13 @@
 # src/llm_client.py
+import os
 from abc import ABC, abstractmethod
 from typing import List
 
 import together
 from azure.identity import DefaultAzureCredential
 from openai import AzureOpenAI
+
+from config import settings
 
 
 class Message(dict):
@@ -38,6 +41,11 @@ class TogetherLLM(LLM):
 
 class AzureOpenAILLM(LLM):
     def __init__(self):
+        os.environ["SSL_CERT_FILE"] = settings.ssl_cert_file
+        os.environ["AZURE_CLIENT_ID"] = settings.
+        os.environ["AZURE_CLIENT_SECRET"] = AZURE_CLIENT_SECRET
+        os.environ["AZURE_TENANT_ID"] = AZURE_TENANT_ID
+
         cred = DefaultAzureCredential()
         token_provider = lambda: cred.get_token(
             "https://9da779ce-c73e-408f-9978-962c4ddd596f.abnamro.onmicrosoft.com/.default"
@@ -50,6 +58,7 @@ class AzureOpenAILLM(LLM):
 
     def get_response(self, messages: List[Message], temperature: float = 0.0, **kwargs) -> str:
         resp = self.client.chat.completions.create(
+            model="snigpt4o",
             messages=messages,
             temperature=temperature,
             **kwargs,
