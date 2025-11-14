@@ -1,10 +1,17 @@
 # src/extractors.py
+from abc import ABC, abstractmethod
 from typing import List
 import json
 from llm_client import LLM, Message
 
 
-class NameExtractor:
+class NameExtractor(ABC):
+    @abstractmethod
+    def extract(self, title: str, description: str) -> List[str]:
+        ...
+
+
+class JsonNameExtractor(NameExtractor):
     def __init__(self, client: LLM):
         self.client = client
 
@@ -24,3 +31,10 @@ class NameExtractor:
         names = self._parse_json(raw)
         return names
 
+
+# --- Factory ---
+def make_name_extractor(method: str, client: LLM) -> NameExtractor:
+    if method == "json":
+        return JsonNameExtractor(client=client)
+    else:
+        raise ValueError("Wrong value for method NameExtractor")

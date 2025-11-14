@@ -2,11 +2,12 @@
 from config import settings
 from scraper import fetch_listings
 
-from bgg import BGGFileRepository, FuzzyNameMatcher
+from bgg import make_bgg_repository
+from matchers import make_name_matcher
 from processing import ListingProcessor
 
-from extractors import NameExtractor
-from llm_client import AzureOpenAILLM
+from extractors import make_name_extractor
+from llm_client import make_llm
 
 
 def main():
@@ -18,16 +19,19 @@ def main():
         category_name=settings.marktplaats_category_name
     )
 
-    # --- 2. Services ---
-    # llm_client = TogetherChatClient(
-    #     api_key=settings.together_api_key,
-    #     model=settings.together_llm_model
-    # )
-    llm_client = AzureOpenAILLM()
-    name_extractor = NameExtractor(client=llm_client)
+    # --- 2. Services (configured via .env) ---
+    llm_client = make_llm(
+        provider=settings.llm_provider,
+        model=settings.together_llm_model,
+        api_key=settings.together_api_key,
+    )
+    name_extractor = make_name_extractor(method=settings.extraction_method, client=llm_client)
 
-    bgg_repo = BGGFileRepository()
-    matcher = FuzzyNameMatcher(repository=bgg_repo)
+    bgg_repo = make_bgg_repository(kind=settings.bgg_repo)
+    matcher = make_name_matcher(
+        method=settings.matching_method,
+        repository=bgg_repo
+    )
 
     processor = ListingProcessor(name_extractor=name_extractor, bgg_matcher=matcher)
 
