@@ -16,6 +16,7 @@ def main():
         zip_code=settings.zip_code,
         distance_km=settings.distance_km,
         limit=settings.max_listings,
+        offset=settings.offset,
         category_name=settings.marktplaats_category_name
     )
 
