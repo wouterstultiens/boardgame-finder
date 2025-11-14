@@ -108,32 +108,5 @@ TEST_CASES: List[PromptTestCase] = [
             "14+\n45\n3-20\nHERZIENE\nEDITIE\nPARTY\n-& co\nORIGINAL\nMEER DAN EEN SPEL,\nHET IS ECHT EEN FEEST!"
         ],
         expected=[{"name": "Party & Co: Original", "lang": "nl"}],
-    ),
-    PromptTestCase(
-        name="",
-        title="",
-        description="",
-        image_texts=[
-
-        ],
-        expected=[{"name": "", "lang": ""}],
-    ),
-    PromptTestCase(
-        name="",
-        title="",
-        description="",
-        image_texts=[
-
-        ],
-        expected=[{"name": "", "lang": ""}],
-    ),
-    PromptTestCase(
-        name="",
-        title="",
-        description="",
-        image_texts=[
-
-        ],
-        expected=[{"name": "", "lang": ""}],
     )
 ]
