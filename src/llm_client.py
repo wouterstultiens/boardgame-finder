@@ -42,9 +42,9 @@ class TogetherLLM(LLM):
 class AzureOpenAILLM(LLM):
     def __init__(self):
         os.environ["SSL_CERT_FILE"] = settings.ssl_cert_file
-        os.environ["AZURE_CLIENT_ID"] = settings.
-        os.environ["AZURE_CLIENT_SECRET"] = AZURE_CLIENT_SECRET
-        os.environ["AZURE_TENANT_ID"] = AZURE_TENANT_ID
+        os.environ["AZURE_CLIENT_ID"] = settings.azure_client_id
+        os.environ["AZURE_TENANT_ID"] = settings.azure_tenant_id
+        os.environ["AZURE_CLIENT_SECRET"] = settings.azure_client_secret
 
         cred = DefaultAzureCredential()
         token_provider = lambda: cred.get_token(
