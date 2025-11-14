@@ -1,15 +1,15 @@
 # src/processing.py
 from models import Listing, Game, BGGData
-from llm import BaseLLM
-from bgg import NameMatcher 
+from bgg import NameMatcher
+from extractors import NameExtractor
 
 class ListingProcessor:
     """
     Handles the enrichment of a Listing object by extracting game names
     and matching them to BGG data.
     """
-    def __init__(self, llm: BaseLLM, bgg_matcher: NameMatcher):
-        self.llm = llm
+    def __init__(self, name_extractor: NameExtractor, bgg_matcher: NameMatcher):
+        self.name_extractor = name_extractor
         self.bgg_matcher = bgg_matcher
 
     def enrich_listing(self, listing: Listing) -> Listing:
@@ -17,7 +17,7 @@ class ListingProcessor:
         Orchestrates the extraction of game names and matching with BGG data.
         """
         # 1. Extract game names
-        game_names = self.llm.extract_names(
+        game_names = self.name_extractor.extract(
             title=listing.title,
             description=listing.description
         )
@@ -26,12 +26,12 @@ class ListingProcessor:
         # 2. Match each game with BGG data
         for game in listing.games:
             self._match_bgg_data(game)
-        
+
         return listing
 
     def _match_bgg_data(self, game: Game) -> None:
         """Matches the LLM name to BGG data and adds it to the Game object."""
-        row = self.bgg_matcher.match_name(game.llm_name) 
+        row = self.bgg_matcher.match_name(game.llm_name)
 
         if row is not None:
             bgg_data = BGGData(

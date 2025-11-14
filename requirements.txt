@@ -3,5 +3,7 @@ pydantic-settings
 
 marktplaats
 together
+openai
 
 pandas
+azure-identity
