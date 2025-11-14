@@ -65,6 +65,7 @@ def run() -> List[Dict[str, object]]:
         actual_items = extractor.extract(
             title=case.title,
             description=case.description,
+            image_texts=case.image_texts
         )
 
         reference = _canonical_items(case.expected)
@@ -80,6 +81,7 @@ def run() -> List[Dict[str, object]]:
                 "case": case.name,
                 "title": case.title,
                 "description": case.description,  
+                "image_texts": case.image_texts,
                 "passed": passed,
                 "score": score,
                 "expected": case.expected,
