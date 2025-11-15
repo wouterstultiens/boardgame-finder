@@ -33,7 +33,9 @@ jobs:
           service_account: 'boardgamefinder-sa@huurwoningvinderbot.iam.gserviceaccount.com'
 
       - name: Run the main pipeline and generate website
-        run: python -m boardgamefinder.main
+        run: |
+          export PYTHONPATH=$GITHUB_WORKSPACE/src
+          python -m boardgamefinder.main
         env:
           ZIP_CODE: ${{ secrets.ZIP_CODE }}
           DISTANCE_KM: ${{ secrets.DISTANCE_KM }}
