@@ -33,9 +33,9 @@ class Settings(BaseSettings):
     bgg_local_file_path: Optional[str] = "bgg_data/games.csv" # For local fallback
 
     # BGG Filtering Rules
-    bgg_min_rating: float = 7.0
-    bgg_min_weight: float = 1.0
-    bgg_max_weight: float = 4.0
+    bgg_min_rating: float = 0.0
+    bgg_min_weight: float = 0.0
+    bgg_max_weight: float = 5.0
 
     # Google Cloud Project Configuration
     google_application_credentials: Optional[str] = None
