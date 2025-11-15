@@ -1,18 +1,31 @@
+# Core Application
 pydantic
 pydantic-settings
 
+# Web Scraping & Details
 marktplaats
+requests
+beautifulsoup4
+
+# LLM Clients
 together
 openai
-
-pandas
 azure-identity
 
-pytest
-ragas
+# Data Handling & Storage
+pandas
+google-cloud-firestore
+google-cloud-storage
 
-# Image recognition
+# OCR
 google-cloud-vision
 
-# Storage
-google-cloud-firestore
+# Web Generation
+Jinja2
+
+# Testing
+pytest
+pytest-mock
+
+# Utility
+python-dotenv

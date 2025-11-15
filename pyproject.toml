@@ -4,8 +4,40 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "boardgamefinder"
-version = "0.1.0"
+version = "0.2.0"
+description = "A pipeline to scrape, analyze, and display board game listings."
 requires-python = ">=3.10"
+readme = "README.md" # Assuming you'll add one
+license = { text = "MIT" }
+authors = [
+  { name = "Wouter Stultiens", email = "wouterstultiens@gmail.com" },
+]
+
+[project.urls]
+Homepage = "https://github.com/wouterstultiens/BoardGameFinder"
 
 [tool.setuptools]
-packages = ["boardgamefinder", "tests"]
+packages = ["boardgamefinder"]
+package-dir = { "" = "src" }
+
+# --- Tool Configurations ---
+
+[tool.ruff]
+# See https://docs.astral.sh/ruff/configuration/
+line-length = 100
+select = ["E", "F", "W", "I", "C90", "N"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --color=yes"
+testpaths = [
+    "tests",
+]
+env_files = [
+    ".env" # Automatically load .env file for tests
+]```

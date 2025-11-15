@@ -1,5 +1,3 @@
-# src/prompts.py
-
 GAME_EXTRACT_SYSTEM = """
 You are a board game listing parser.
 
@@ -20,7 +18,7 @@ Output:
 - Output **only** the JSON array with no extra text.
 
 If no game can be confidently identified:
-- Output exactly: [{"name": "", "lang": "unknown"}]
+- Output exactly: []
 
 Rules for extracting "name":
 - Use the most specific full title visible (including edition, subtitle, or variant).
@@ -32,7 +30,7 @@ Rules for "lang":
 - Use "nl" if the edition or title is clearly Dutch.
 - Use "en" if the edition or title is clearly English or internationally English-first.
 - Use "unknown" only when the language cannot be confidently determined
-- Use "unknown" for languages other han Dutch or English
+- Use "unknown" for languages other than Dutch or English
 
 Normalize the name:
   - Combine fragmented OCR words into one line.

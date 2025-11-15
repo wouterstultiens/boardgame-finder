@@ -1,7 +1,69 @@
+# Environments
 .venv/
+venv/
+env/
+
+# Python cache
 __pycache__/
-*.xml
-.idea/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Secrets
 .env
-boardgamefinder.egg-info/
+*.env
+
+# IDE settings
+.idea/
+.vscode/
+
+# Build artifacts and logs
 *.log
+*.xml
+*.prof
+*.pid
+*.seed
+*.out
+*.err
+
+# Website output
+/docs/
+
+# Pytest
+.pytest_cache/```
+
+### `pyproject.toml`
+```toml
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "boardgamefinder"
+version = "0.2.0"
+description = "A pipeline to scrape, analyze, and display board game listings."
+requires-python = ">=3.10"
+
+[tool.setuptools]
+packages = ["boardgamefinder"]
+package-dir = {"" = "src"}
