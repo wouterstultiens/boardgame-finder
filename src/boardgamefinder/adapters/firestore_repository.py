@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from google.cloud import firestore
 
+from ..config import settings
 from ..domain.models import Listing
 
 class ListingRepository:

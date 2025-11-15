@@ -1,7 +1,12 @@
 # src/boardgamefinder/pipeline/run_pipeline.py
 from ..config import settings
 from ..adapters.marktplaats_client import MarktplaatsClient
-from ..adapters.firestore_repository import ListingRepository
+from ..adapters.firestore_repository import ListingRepository, get_listing_repository
+from ..adapters.ocr_client import OcrClient
+from ..adapters.llm_client import get_llm_client
+from ..adapters.bgg_repository import get_bgg_repository
+from ..services.extractor import JsonNameExtractor
+from ..services.matcher import FuzzyNameMatcher
 from .enrich_listing import ListingEnricher
 
 def run_pipeline(enricher: ListingEnricher, repo: ListingRepository):
@@ -25,13 +30,36 @@ def run_pipeline(enricher: ListingEnricher, repo: ListingRepository):
         if cached and cached.games:
             print(f"Skipping already processed listing: {listing.title}")
             continue
-        
+
         new_listings_count += 1
         # Enrich the new listing with games and BGG data
         enriched_listing = enricher.enrich(listing)
-        
+
         # Save the result to the database
         repo.save(enriched_listing)
 
     print(f"--- Pipeline Finished ---")
     print(f"Processed {new_listings_count} new listings out of {len(scraped_listings)} found.")
+
+
+if __name__ == "__main__":
+    # 1. Initialize all necessary components from adapters and services
+    print("Initializing components for pipeline run...")
+    listing_repo = get_listing_repository()
+    ocr_client = OcrClient()
+    llm_client = get_llm_client()
+    bgg_repo = get_bgg_repository()
+
+    # 2. Set up the extractor and matcher services
+    extractor = JsonNameExtractor(client=llm_client)
+    matcher = FuzzyNameMatcher(repository=bgg_repo)
+
+    # 3. Create the main enricher service
+    enricher = ListingEnricher(
+        ocr_client=ocr_client,
+        extractor=extractor,
+        matcher=matcher
+    )
+
+    # 4. Run the pipeline with the configured components
+    run_pipeline(enricher=enricher, repo=listing_repo)
