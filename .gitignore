@@ -45,25 +45,10 @@ MANIFEST
 *.seed
 *.out
 *.err
+*.sh
 
 # Website output
 /docs/
 
 # Pytest
-.pytest_cache/```
-
-### `pyproject.toml`
-```toml
-[build-system]
-requires = ["setuptools>=61", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "boardgamefinder"
-version = "0.2.0"
-description = "A pipeline to scrape, analyze, and display board game listings."
-requires-python = ">=3.10"
-
-[tool.setuptools]
-packages = ["boardgamefinder"]
-package-dir = {"" = "src"}
+.pytest_cache/

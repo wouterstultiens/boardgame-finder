@@ -40,6 +40,7 @@ def run_pipeline(enricher: ListingEnricher, repo: ListingRepository):
 
     print(f"--- Pipeline Finished ---")
     print(f"Processed {new_listings_count} new listings out of {len(scraped_listings)} found.")
+    return new_listings_count
 
 
 if __name__ == "__main__":
