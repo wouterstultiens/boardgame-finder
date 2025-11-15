@@ -23,9 +23,5 @@ google-cloud-vision
 # Web Generation
 Jinja2
 
-# Testing
-pytest
-pytest-mock
-
 # Utility
 python-dotenv
