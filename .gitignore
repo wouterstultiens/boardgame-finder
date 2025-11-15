@@ -47,8 +47,5 @@ MANIFEST
 *.err
 *.sh
 
-# Website output
-/docs/
-
 # Pytest
 .pytest_cache/
