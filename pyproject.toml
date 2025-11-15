@@ -40,4 +40,4 @@ testpaths = [
 ]
 env_files = [
     ".env" # Automatically load .env file for tests
-]```
+]
