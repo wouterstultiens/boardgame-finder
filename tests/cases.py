@@ -203,7 +203,7 @@ TEST_CASES: List[PromptTestCase] = [
             "11\n10\n8\n5",
             "UK Instructions\nRUMMY-O\nA GAME FOR 2-4 PLAYERS\nA game of skill for adults 106 plastic tiles, 4 plastic racke\nHOW TO PLAY\nTHE TILES\nThe gaha Rummy Can comes of 106 1\nNUMBER OF PLAYERS\ncomponding to two packs of co\no it The unbon 111\nour players and a game com 4 rounds-sach say playing first one rodean playing, sach\nPILING AND DEALING THE TILES\nw each player has\nTHE PLAY\nLach pay\nthe it takes a\nThe test pay ate arranging h\nsher for a tas down stack or the the just acad\ntrange theses to Mets There are two type\nSCORING VALUE OF TILES\n18 11 12 13 counts 10 ports sack 2 through 9 count as\nGOING ON BOARD\nA\nThe dicas\nthe he\nGROUPS-thew"
         ],
-        expected=[{"name": "Rummy-O Deluxe", "lang": ""}],
+        expected=[{"name": "Rummy-O: Deluxe", "lang": ""}],
         bgg=[{"id": "811", "name": "Rummikub", "lang": "en", "exact_match": False}] # Rummikub == Rummy-O in English, Deluxe edition not on BGG
     )
 ]
