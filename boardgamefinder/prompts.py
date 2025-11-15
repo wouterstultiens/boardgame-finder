@@ -31,7 +31,7 @@ Rules for extracting "name":
 Rules for "lang":
 - Use "nl" if the edition or title is clearly Dutch.
 - Use "en" if the edition or title is clearly English or internationally English-first.
-- Use "unknown" only when the language cannot be confidently determined.
+- Use "unknown" only when the language cannot be confidently determined OR if it is a language other than Dutch or English.
 
 Normalize the name:
   - Combine fragmented OCR words into one line.

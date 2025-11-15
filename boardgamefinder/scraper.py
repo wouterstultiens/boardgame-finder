@@ -1,15 +1,17 @@
 from typing import List
-
 import requests
+import json
 from bs4 import BeautifulSoup
 from marktplaats import SearchQuery, SortBy, SortOrder, category_from_name
-
 from .models import Listing
 
 
-def _full_description(url: str) -> str:
+def _get_listing_details(url: str) -> tuple[list[str], str]:
+    """
+    Fetch images and description for a single listing in one HTTP request.
+    """
     try:
-        html = requests.get(
+        response = requests.get(
             url,
             timeout=20,
             headers={
@@ -18,32 +20,51 @@ def _full_description(url: str) -> str:
                     "(KHTML, like Gecko) Chrome/120.0.0 Safari/537.36"
                 )
             },
-        ).text
+        )
+        response.raise_for_status()
 
-        soup = BeautifulSoup(html, "html.parser")
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # extract images from ld+json script
+        images = []
+        for data in soup.select('script[type="application/ld+json"]'):
+            try:
+                parsed = json.loads(data.text)
+                if isinstance(parsed, dict) and parsed.get("@type") == "Product":
+                    images.extend(f"https:{img}" for img in parsed.get("image", []))
+                    break
+            except json.JSONDecodeError:
+                continue
+
+        # extract description
         desc_div = soup.select_one("div.Description-description")
-        inner = desc_div.decode_contents()
-        inner = inner.replace("<br/>", "\n").replace("<br />", "\n").replace("<br>", "\n")
-        return BeautifulSoup(inner, "html.parser").get_text()
-    except:
-        print("\n\n\033[31mUNABLE TO GET FULL DESCRIPTION\033[0m\n\n")
-        return ""
+        if desc_div:
+            inner = desc_div.decode_contents()
+            inner = inner.replace("<br/>", "\n").replace("<br />", "\n").replace("<br>", "\n")
+            description = BeautifulSoup(inner, "html.parser").get_text().strip()
+        else:
+            description = ""
+
+        return images, description
+    except Exception as e:
+        print(f"\n\033[31mUNABLE TO GET DETAILS FOR {url}: {e}\033[0m\n")
+        return [], ""
 
 
 def _to_listing_data(listing) -> Listing:
-    images = [str(img) for img in listing.get_images()]
     url = str(listing.link)
+    images, full_description = _get_listing_details(url)
 
     return Listing(
         title=str(listing.title),
-        description=_full_description(url) or listing.description,
+        description=full_description or listing.description,
         price=float(listing.price),
         price_type=str(listing.price_type),
         link=url,
         city=listing.location.city,
         distance_km=int(listing.location.distance / 1000),
         date=listing.date,
-        images=images,
+        images=images or [str(img) for img in listing.get_images()],
     )
 
 
@@ -53,6 +74,9 @@ def fetch_listings(
     category_name: str,
     limit: int,
 ) -> List[Listing]:
+    """
+    Fetch a list of listings and enrich each with images + full description.
+    """
     search = SearchQuery(
         zip_code=zip_code,
         distance=distance_km * 1000,
