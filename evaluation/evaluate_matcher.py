@@ -5,7 +5,7 @@ import os
 # Add src to path to allow imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
-from tests.cases import TEST_CASES
+from evaluation.cases import TEST_CASES
 from boardgamefinder.services.matcher import FuzzyNameMatcher
 from boardgamefinder.adapters.bgg_repository import get_bgg_repository
 
