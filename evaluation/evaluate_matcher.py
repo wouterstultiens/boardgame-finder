@@ -26,34 +26,40 @@ def main():
     for case in TEST_CASES:
         print(f"\n[TEST CASE]: {case.name}")
 
-        names_to_match = [item['llm_name'] for item in case.expected_extraction]
+        names_and_langs_to_match = [
+            {'name': item['llm_name'], 'lang': item['llm_lang']}
+            for item in case.expected_extraction
+        ]
         expected_matches = case.expected_matches
 
-        if len(names_to_match) != len(expected_matches):
-            print(f"  - ❌ ERROR: Mismatch between extracted names ({len(names_to_match)}) and expected matches ({len(expected_matches)}). Skipping.")
-            num_items = max(len(names_to_match), len(expected_matches))
+        if len(names_and_langs_to_match) != len(expected_matches):
+            print(f"  - ❌ ERROR: Mismatch between extracted items ({len(names_and_langs_to_match)}) and expected matches ({len(expected_matches)}). Skipping.")
+            num_items = max(len(names_and_langs_to_match), len(expected_matches))
             results["Fail"] += num_items
             total_matches_to_test += num_items
             continue
 
-        if not names_to_match:
+        if not names_and_langs_to_match:
             expected_ids = expected_matches[0].get('id', []) if expected_matches else []
-            if not expected_ids:
-                 print("  - ✅ Pass: Correctly extracted no games to match, as expected.")
-                 results["Pass"] += 1
+            if not expected_ids or not expected_ids[0]:
+                print("  - ✅ Pass: Correctly extracted no games to match, as expected.")
+                results["Pass"] += 1
             else:
-                 print(f"  - ❌ Fail: No items to match, but expected IDs {expected_ids}.")
-                 results["Fail"] += 1
+                print(f"  - ❌ Fail: No items to match, but expected IDs {expected_ids}.")
+                results["Fail"] += 1
             total_matches_to_test += 1
             continue
 
-        for i, llm_name in enumerate(names_to_match):
+        for i, item_to_match in enumerate(names_and_langs_to_match):
             total_matches_to_test += 1
+            llm_name = item_to_match['name']
+            llm_lang = item_to_match['lang']
+            
             expected_match_info = expected_matches[i]
             expected_ids = expected_match_info.get('id', [])
 
             try:
-                actual_match = matcher.match(llm_name)
+                actual_match = matcher.match(llm_name, llm_lang)
                 actual_id = str(actual_match.id) if actual_match else ""
 
                 status = "Fail" # Default to Fail

@@ -99,7 +99,7 @@ TEST_CASES: List[PromptTestCase] = [
             "Alan R. Moon\nAlan R. Moon\nTICKET TO RIDE\nHAO\nNEDERLAND\nTO RIDE\nNEDERLAND\nDeutschlan\nNEDERLAND"
         ],
         expected_extraction=[{"llm_name": "Ticket to Ride: Nederland", "llm_lang": "nl"}],
-        expected_matches=[{"id": ["147938"], "name": "Ticket to Ride Map Collection 4: Nederland ", "lang": "en", "exact_match": True}]
+        expected_matches=[{"id": ["147938"], "name": "Ticket to Ride Map Collection 4: Nederland", "lang": "en", "exact_match": True}]
     ),
     PromptTestCase(
         name="nl_monopoly_bathmen",

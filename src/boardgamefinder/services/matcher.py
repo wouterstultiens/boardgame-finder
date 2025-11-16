@@ -28,7 +28,7 @@ class NameMatcher(ABC):
         self.df = self.df[self.df["Name"].notna()].copy()
 
     @abstractmethod
-    def match(self, name: str) -> Optional[BGGData]:
+    def match(self, name: str, llm_lang: str) -> Optional[BGGData]:
         ...
 
 
@@ -42,7 +42,7 @@ class FuzzyNameMatcher(NameMatcher):
         self._norm_names = [_normalize_name(n) for n in self._names]
         print(f"FuzzyNameMatcher initialized with {len(self._names)} BGG entries.")
 
-    def match(self, name: str) -> Optional[BGGData]:
+    def match(self, name: str, llm_lang: str) -> Optional[BGGData]:
         if not name:
             return None
 
@@ -109,7 +109,7 @@ class LLMNameMatcher(NameMatcher):
             [f"- ID: {row['BGGId']}, Name: {row['Name']}" for _, row in candidates_df.iterrows()]
         )
 
-    def match(self, name: str) -> Optional[BGGData]:
+    def match(self, name: str, llm_lang: str) -> Optional[BGGData]:
         if not name:
             return None
 
@@ -137,7 +137,7 @@ class LLMNameMatcher(NameMatcher):
 
         # Step 2: Call LLM to select the best candidate
         prompt_candidates = self._format_candidates_for_prompt(all_candidates)
-        user_prompt = f'Original game name: "{name}"\n\nCandidate games:\n{prompt_candidates}'
+        user_prompt = f'Original game name: "{name}"\nllm_lang: "{llm_lang}"\n\nCandidate games:\n{prompt_candidates}'
         messages = [
             Message("system", MATCHER_SYSTEM_PROMPT),
             Message("user", user_prompt),
