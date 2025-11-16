@@ -42,8 +42,8 @@ def main():
         
         # Compare old and new games
         # A simple but effective comparison is to dump them to sorted JSON strings
-        old_games_json = json.dumps(sorted([g.model_dump() for g in listing.games], key=lambda x: x['llm_name']), sort_keys=True)
-        new_games_json = json.dumps(sorted([g.model_dump() for g in new_games], key=lambda x: x['llm_name']), sort_keys=True)
+        old_games_json = json.dumps(sorted([g.model_dump(mode="json") for g in listing.games], key=lambda x: x['llm_name']), sort_keys=True)
+        new_games_json = json.dumps(sorted([g.model_dump(mode="json") for g in new_games], key=lambda x: x['llm_name']), sort_keys=True)
 
         if old_games_json == new_games_json:
             print("  -> No change in extracted games. Skipping.")
