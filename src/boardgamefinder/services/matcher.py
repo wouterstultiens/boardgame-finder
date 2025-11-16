@@ -129,11 +129,11 @@ class LLMNameMatcher(NameMatcher):
             print(f"No fuzzy candidates found for '{name}'.")
             return None
 
-        print(f"\n--- Debugging Candidates for '{name}' ---")
-        print(f"Found {len(all_candidates)} unique candidates:")
-        for _, row in all_candidates.iterrows():
-            print(f"  - ID: {row['BGGId']}, Name: {row['Name']}")
-        print("------------------------------------------")
+        # print(f"\n--- Debugging Candidates for '{name}' ---")
+        # print(f"Found {len(all_candidates)} unique candidates:")
+        # for _, row in all_candidates.iterrows():
+        #     print(f"  - ID: {row['BGGId']}, Name: {row['Name']}")
+        # print("------------------------------------------")
 
         # Step 2: Call LLM to select the best candidate
         prompt_candidates = self._format_candidates_for_prompt(all_candidates)
