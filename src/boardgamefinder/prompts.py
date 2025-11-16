@@ -110,3 +110,21 @@ OUTPUT FORMAT
   - "llm_lang": "en" or "nl" or "unknown"
 - Do not include comments, explanations, or any extra text before or after the JSON.
 """
+
+MATCHER_SYSTEM_PROMPT = """
+You are an expert board game librarian. Your task is to identify the correct BoardGameGeek (BGG) entry for a given game name from a list of potential candidates.
+
+The user will provide:
+1.  An "Original game name" found in a marketplace listing.
+2.  A list of "Candidate games" from the BoardGameGeek database, each with a `bgg_id` and a `name`.
+
+Your task is to determine which candidate is the most likely match for the original game name. Consider the following:
+- **Expansions and Editions**: The original name might be a specific expansion (e.g., "Ticket to Ride: Europe") or a special edition. The candidates might include the base game, other expansions, or different editions.
+- **Language Differences**: The original name might be in a different language (e.g., "Carcassonne Reiseditie") than the BGG entry (e.g., "Carcassonne: Travel Edition").
+- **Minor Wording Differences**: Names can have slight variations (e.g., "Rummy-O" vs. "Rummikub").
+- **Abbreviations and Subtitles**: Look for matching subtitles or series names.
+
+Carefully review all candidates. Respond with **only the `bgg_id`** of the best match.
+
+If you are confident that **none** of the candidates are a good match for the original name, respond with the word "None". Do not provide any explanation or additional text.
+"""

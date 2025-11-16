@@ -130,7 +130,7 @@ TEST_CASES: List[PromptTestCase] = [
             "14+\n45\n3-20\nHERZIENE\nEDITIE\nPARTY\n-& co\nORIGINAL\nMEER DAN EEN SPEL,\nHET IS ECHT EEN FEEST!"
         ],
         expected_extraction=[{"llm_name": "Party & Co: Original", "llm_lang": "nl"}],
-        expected_matches=[{"id": "13972", "name": "Party & Co: Original", "lang": "en", "exact_match": True}]
+        expected_matches=[{"id": "13972", "name": "Party & Co: Original", "lang": "en", "exact_match": True}] # 29281 is also Party & Co: Original
     ),
     PromptTestCase(
         name="nl_billy_bever",

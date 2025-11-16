@@ -1,32 +1,28 @@
 # evaluation/evaluate_matcher.py
-import sys
-import os
-
-# Add src to path to allow imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 from evaluation.cases import TEST_CASES
-from boardgamefinder.services.matcher import FuzzyNameMatcher
+from boardgamefinder.services.matcher import LLMNameMatcher
 from boardgamefinder.adapters.bgg_repository import get_bgg_repository
+from boardgamefinder.adapters.llm_client import get_llm_client
 
 def main():
     """
-    Evaluates the FuzzyNameMatcher against a predefined set of test cases.
+    Evaluates the LLMNameMatcher against a predefined set of test cases.
     It validates if the correct BGG ID is retrieved for an extracted game name.
     """
     print("Initializing components for matcher evaluation...")
     try:
         bgg_repo = get_bgg_repository()
-        matcher = FuzzyNameMatcher(repository=bgg_repo)
+        llm_client = get_llm_client()
+        matcher = LLMNameMatcher(repository=bgg_repo, llm_client=llm_client)
     except Exception as e:
         print(f"Error initializing components: {e}")
-        print("Please ensure your BGG data source is correctly configured.")
+        print("Please ensure your BGG data source and LLM client are correctly configured.")
         return
 
     results = {"Pass": 0, "Fail": 0}
     total_matches_to_test = 0
 
-    print("\n--- Evaluating FuzzyNameMatcher ---")
+    print("\n--- Evaluating LLMNameMatcher ---")
 
     for case in TEST_CASES:
         print(f"\n[TEST CASE]: {case.name}")
@@ -42,10 +38,16 @@ def main():
             continue
 
         if not names_to_match:
-            print("  - No items to match for this case.")
+            expected_id = expected_matches[0].get('id', '') if expected_matches else ''
+            if not expected_id:
+                 print("  - ✅ Pass: Correctly extracted no games to match, as expected.")
+                 results["Pass"] += 1
+            else:
+                 print(f"  - ❌ Fail: No items to match, but expected ID {expected_id}.")
+                 results["Fail"] += 1
+            total_matches_to_test += 1
             continue
 
-        # Iterate over the extracted names and their corresponding expected BGG match
         for i, llm_name in enumerate(names_to_match):
             total_matches_to_test += 1
             expected_match = expected_matches[i]
