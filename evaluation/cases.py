@@ -140,7 +140,7 @@ TEST_CASES: List[PromptTestCase] = [
             ""
         ],
         expected_extraction=[{"llm_name": "Bert Bever", "llm_lang": "nl"}],
-        expected_matches=[{"id": "50458", "name": "Billy Biber", "lang": "en", "exact_match": True}]
+        expected_matches=[{"id": "50458", "name": "Billy Biber", "lang": "en", "exact_match": True}] # 35652 Log Jam is the same game
     ),
     PromptTestCase(
         name="nl_camel_up",
