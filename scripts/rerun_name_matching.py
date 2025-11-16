@@ -2,7 +2,8 @@
 import argparse
 from boardgamefinder.adapters.firestore_repository import get_listing_repository
 from boardgamefinder.adapters.bgg_repository import get_bgg_repository
-from boardgamefinder.services.matcher import FuzzyNameMatcher
+from boardgamefinder.adapters.llm_client import get_llm_client
+from boardgamefinder.services.matcher import LLMNameMatcher
 
 def main():
     """
@@ -19,7 +20,8 @@ def main():
     print("Initializing components...")
     repo = get_listing_repository()
     bgg_repo = get_bgg_repository()
-    matcher = FuzzyNameMatcher(repository=bgg_repo)
+    llm_client = get_llm_client()
+    matcher = LLMNameMatcher(repository=bgg_repo, llm_client=llm_client)
 
     print("Fetching all listings from Firestore...")
     all_listings = repo.get_all()
@@ -38,7 +40,7 @@ def main():
             old_bgg_id = game.bgg_data.id if game.bgg_data else None
             
             # Rerun matching
-            new_bgg_data = matcher.match(game.llm_name)
+            new_bgg_data = matcher.match(game.llm_name, game.llm_lang)
             new_bgg_id = new_bgg_data.id if new_bgg_data else None
 
             if old_bgg_id != new_bgg_id:
