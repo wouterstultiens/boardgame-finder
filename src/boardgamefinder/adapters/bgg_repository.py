@@ -7,7 +7,7 @@ from google.cloud import storage
 
 from ..config import settings
 
-COLS = ["BGGId", "Name", "YearPublished", "GameWeight", "AvgRating", "ImagePath"]
+COLS = ["BGGId", "Name", "YearPublished", "GameWeight", "AvgRating", "ImagePath", "NumOwned"]
 
 class BGGRepository(ABC):
     """Abstract interface for a repository of BoardGameGeek game data."""
@@ -26,6 +26,9 @@ class BGGFileRepository(BGGRepository):
         if self._df is None:
             print(f"Loading BGG data from local file: {self._path}...")
             self._df = pd.read_csv(self._path)[COLS]
+            
+            # At least 200 people should own it
+            self._df = self._df[self._df["NumOwned"] >= 200].drop(columns=["NumOwned"])
             print("BGG data loaded successfully.")
         return self._df
 
