@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # Core Services Configuration
     extraction_method: Literal["json"] = "json"
-    matching_method: Literal["fuzzy"] = "fuzzy"
+    matching_method: Literal["fuzzy", "llm"] = "llm"
 
     # BGG Data Source Configuration
     bgg_repository_type: Literal["gcs", "file", "dummy"] = "gcs"

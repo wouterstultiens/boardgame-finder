@@ -5,7 +5,7 @@ from .adapters.ocr_client import OcrClient
 from .adapters.llm_client import get_llm_client
 from .adapters.bgg_repository import get_bgg_repository
 from .services.extractor import JsonNameExtractor
-from .services.matcher import FuzzyNameMatcher
+from .services.matcher import FuzzyNameMatcher, LLMNameMatcher
 from .pipeline.enrich_listing import ListingEnricher
 from .pipeline.run_pipeline import run_pipeline
 from .web.generator import WebGenerator
@@ -19,7 +19,7 @@ def main():
     bgg_repo = get_bgg_repository()
 
     extractor = JsonNameExtractor(client=llm_client)
-    matcher = FuzzyNameMatcher(repository=bgg_repo)
+    matcher = LLMNameMatcher(repository=bgg_repo, llm_client=llm_client)
     enricher = ListingEnricher(
         ocr_client=ocr_client,
         extractor=extractor,
