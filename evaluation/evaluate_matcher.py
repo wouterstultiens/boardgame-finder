@@ -12,6 +12,7 @@ from boardgamefinder.adapters.bgg_repository import get_bgg_repository
 def main():
     """
     Evaluates the FuzzyNameMatcher against a predefined set of test cases.
+    It validates if the correct BGG ID is retrieved for an extracted game name.
     """
     print("Initializing components for matcher evaluation...")
     try:
@@ -29,36 +30,53 @@ def main():
 
     for case in TEST_CASES:
         print(f"\n[TEST CASE]: {case.name}")
-        
-        if not case.expected_matches:
-            print("  - No matches to test for this case.")
+
+        names_to_match = [item['llm_name'] for item in case.expected_extraction]
+        expected_matches = case.expected_matches
+
+        if len(names_to_match) != len(expected_matches):
+            print(f"  - ❌ ERROR: Mismatch between number of extracted names ({len(names_to_match)}) and expected matches ({len(expected_matches)}). Skipping.")
+            num_items = max(len(names_to_match), len(expected_matches))
+            results["Fail"] += num_items
+            total_matches_to_test += num_items
             continue
-            
-        for llm_name, expected_match in case.expected_matches.items():
+
+        if not names_to_match:
+            print("  - No items to match for this case.")
+            continue
+
+        # Iterate over the extracted names and their corresponding expected BGG match
+        for i, llm_name in enumerate(names_to_match):
             total_matches_to_test += 1
-            
+            expected_match = expected_matches[i]
+
             try:
                 actual_match = matcher.match(llm_name)
-                
-                actual_id = str(actual_match.id) if actual_match else None
-                expected_id = expected_match.id if expected_match else None
-                
-                status = "Fail"
-                # Pass if both are None or if they are equal strings
+
+                actual_id = str(actual_match.id) if actual_match else ""
+                expected_id = expected_match.get('id', '')
+
                 if actual_id == expected_id:
                     status = "Pass"
-                
+                    emoji = "✅"
+                else:
+                    status = "Fail"
+                    emoji = "❌"
+
                 results[status] += 1
-                
+
                 print(f"  - Input: '{llm_name}'")
-                print(f"    - Status:          {status}")
-                print(f"    - Expected BGG ID: {expected_id}")
-                print(f"    - Actual BGG ID:   {actual_id}")
+                print(f"    - Status:          {emoji} {status}")
+                print(f"    - Expected BGG ID: {expected_id or 'None'}")
+                print(f"    - Actual BGG ID:   {actual_id or 'None'}")
                 if actual_match:
                     print(f"    - Actual BGG Name: '{actual_match.name}'")
+                if status == "Fail" and expected_id:
+                    expected_name = expected_match.get('name', 'N/A')
+                    print(f"    - Expected BGG Name: '{expected_name}'")
 
             except Exception as e:
-                print(f"  - ERROR processing match for '{llm_name}': {e}")
+                print(f"  - ❌ ERROR processing match for '{llm_name}': {e}")
                 results["Fail"] += 1
 
 
