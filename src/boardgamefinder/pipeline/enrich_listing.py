@@ -34,7 +34,7 @@ class ListingEnricher:
 
         # 3. Match each extracted game with BGG data
         for game in listing.games:
-            bgg_match = self.matcher.match(game.llm_name)
+            bgg_match = self.matcher.match(game.llm_name, game.llm_lang)
             if bgg_match:
                 game.bgg_data = bgg_match
 
