@@ -26,10 +26,10 @@ class JsonNameExtractor(NameExtractor):
         for item in items:
             if not isinstance(item, dict):
                 continue
-            name = str(item.get("name", "")).strip()
-            lang = str(item.get("lang", "unknown")).strip().lower()
-            if name: # Only include items with a name
-                out.append({"llm_name": name, "llm_lang": lang})
+            llm_name = str(item.get("llm_name", "")).strip()
+            llm_lang = str(item.get("llm_lang", "unknown")).strip().lower()
+            if llm_name: # Only include items with a name
+                out.append({"llm_name": llm_name, "llm_lang": llm_lang})
         return out
 
     def _parse_json(self, raw_message: str) -> List[Dict[str, str]]:
