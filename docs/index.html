@@ -3,32 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Board Game Finder</title>
+    <title>Bordspellen in de buurt (7412XM)</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 960px; margin: 2rem auto; padding: 0 1rem; background-color: #f8f9fa; }
-        h1 { text-align: center; color: #0056b3; }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .game-card { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; }
-        .game-card img { width: 100%; height: 200px; object-fit: cover; }
-        .game-info { padding: 1rem; flex-grow: 1; }
-        .game-title { font-size: 1.25rem; font-weight: bold; margin: 0 0 0.5rem; }
-        .game-title a { text-decoration: none; color: #0056b3; }
-        .game-title a:hover { text-decoration: underline; }
-        .game-meta { display: flex; justify-content: space-between; font-size: 0.9rem; color: #555; margin-bottom: 1rem; }
-        .game-listings { border-top: 1px solid #eee; padding-top: 1rem; }
-        .listing { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; font-size: 0.9rem; }
-        .listing a { background-color: #e9ecef; padding: 0.25rem 0.75rem; border-radius: 12px; text-decoration: none; color: #333; font-weight: 500; }
-        .listing a:hover { background-color: #ced4da; }
-        footer { text-align: center; margin-top: 3rem; color: #777; font-size: 0.8rem; }
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg-color: #2a2a2a;
+            --text-color: #e0e0e0;
+            --text-color-secondary: #a0a0a0;
+            --border-color: #444;
+            --link-color: #64b5f6;
+            --link-hover-color: #90caf9;
+            --button-bg-color: #333;
+            --button-hover-bg-color: #444;
+            --button-active-bg-color: #0056b3;
+            --shadow-color: rgba(0,0,0,0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: var(--bg-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--link-color);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+        }
+
+        .filter-group, .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .controls button {
+            background-color: var(--button-bg-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .controls button:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        .controls button.active {
+            background-color: var(--button-active-bg-color);
+            font-weight: bold;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background-color: var(--card-bg-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .game-card.hidden {
+            display: none;
+        }
+        
+        /* Small card styles */
+        .view-small .game-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        .view-small .game-card img {
+            height: 120px;
+        }
+        
+        .view-small .game-title {
+            font-size: 1rem;
+        }
+
+        .view-small .game-meta, .view-small .listing {
+            font-size: 0.8rem;
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .game-info {
+            padding: 1rem;
+            flex-grow: 1;
+        }
+
+        .game-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin: 0 0 0.5rem;
+        }
+
+        .game-title a {
+            text-decoration: none;
+            color: var(--link-color);
+        }
+
+        .game-title a:hover {
+            text-decoration: underline;
+            color: var(--link-hover-color);
+        }
+
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .game-listings {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .listing {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .listing a {
+            background-color: var(--button-bg-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .listing a:hover {
+            background-color: var(--button-hover-bg-color);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-color-secondary);
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Board Game Finder</h1>
+        <h1>Bordspellen in de buurt (7412XM)</h1>
     </header>
-    <main class="game-grid">
+
+    <div class="controls">
+        <div class="filter-group">
+            <strong>Added:</strong>
+            <button data-days="0.5">12 hours</button>
+            <button data-days="1">Past day</button>
+            <button data-days="3">Past 3 days</button>
+            <button data-days="7">Past week</button>
+            <button data-days="14">Past 2 weeks</button>
+            <button data-days="30">Past month</button>
+        </div>
+        <div class="toggle-group">
+            <strong>View:</strong>
+            <button id="size-toggle">Toggle Size</button>
+        </div>
+    </div>
+
+    <main id="game-container" class="game-grid">
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/QFiIRd2kimaMqTyWsX0aUg__original/img/DOgIp57F7tKZvxeITGAd3e_Q9as=/0x0/filters:format(jpeg)/pic158548.jpg" alt="Puerto Rico">
             
@@ -46,14 +219,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/VceWk5QVkgIp6rWDl5qHKQ__original/img/8lLnp9nod-NhjaoUobcZ3vvb7Mg=/0x0/filters:format(jpeg)/pic2611318.jpg" alt="Mombasa">
             
@@ -71,14 +244,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/j6iQpZ4XkemZP07HNCODBA__original/img/96COuakNiLRrjDLc1sM4Zxsw4WE=/0x0/filters:format(jpeg)/pic394356.jpg" alt="Dominion">
             
@@ -96,14 +269,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/0K1AOciqlMVUWFPLTJSiww__original/img/O37sCRSJLq4S8EpCxFDNVsNBuxE=/0x0/filters:format(jpeg)/pic66668.jpg" alt="Ticket to Ride: Europe">
             
@@ -121,19 +294,19 @@
                     
                     <div class="listing">
                         <span>€10.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333996807" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333996807" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€7.50 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334881656" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334881656" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/okM0dq_bEXnbyQTOvHfwRA__original/img/aVZEXAI-cUtuunNfPhjeHlS4fwQ=/0x0/filters:format(png)/pic6544250.png" alt="Carcassonne">
             
@@ -151,24 +324,24 @@
                     
                     <div class="listing">
                         <span>€10.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334267117" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334267117" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-14T00:00:00">
             
             <img src="https://cf.geekdo-images.com/ZWJg0dCdrWHxVnc0eFXK8w__original/img/LgzEsQlF3xkSEQLoorc8ntiYiIY=/0x0/filters:format(jpeg)/pic38668.jpg" alt="Ticket to Ride">
             
@@ -186,24 +359,24 @@
                     
                     <div class="listing">
                         <span>€18.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333999889" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333999889" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333999359" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333999359" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333999359" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333999359" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/tLrK0_NslFKQL6OvpEqi-w__original/img/YsYwH8aiFnMr--fUMTYjNjhy_A4=/0x0/filters:format(jpeg)/pic839808.jpg" alt="Carcassonne: The City">
             
@@ -221,14 +394,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/IO8_BYKeofnWy8DIjo2RRg__original/img/GEmDZyN1Q9Jlv88QvOF58N7yBIo=/0x0/filters:format(jpeg)/pic2606106.jpg" alt="Legends of Andor">
             
@@ -246,14 +419,14 @@
                     
                     <div class="listing">
                         <span>€10.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334690462" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334690462" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-14T00:00:00">
             
             <img src="https://cf.geekdo-images.com/gJq8JOmOmmZSFpbrWGQMDQ__original/img/nrik6K05TtQl7RSfCD-syaOnBoU=/0x0/filters:format(png)/pic4666620.png" alt="Ticket to Ride: London">
             
@@ -271,14 +444,14 @@
                     
                     <div class="listing">
                         <span>€15.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333998245" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333998245" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/W3Bsga_uLP9kO91gZ7H8yw__original/img/xV7oisd3RQ8R-k18cdWAYthHXsA=/0x0/filters:format(jpeg)/pic2419375.jpg" alt="Catan">
             
@@ -296,14 +469,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/_4RAdG5_9sBDHweuwo7jhw__original/img/POsEsvwsvH74r6vTk_75VjxnZRI=/0x0/filters:format(png)/pic3147391.png" alt="Carcassonne: Amazonas">
             
@@ -321,14 +494,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/I-oc07QuBGUZ0hxOz0H9zw__original/img/L0-XqCdyl_Ij2lfKSxbGyXVd1QA=/0x0/filters:format(png)/pic4550494.png" alt="Monsieur Carrousel">
             
@@ -346,14 +519,14 @@
                     
                     <div class="listing">
                         <span>€14.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334545241" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334545241" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/1ph2jVOD1MudR1fK1nkwwA__original/img/73QLoWe-ejV9mijfd7HWZwns51A=/0x0/filters:format(png)/pic2031446.png" alt="Camel Up">
             
@@ -371,14 +544,14 @@
                     
                     <div class="listing">
                         <span>€25.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334280134" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334280134" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/iMohFrlsPRNWb63oXsUplw__original/img/h2T8yfvTcBDC8OyVi6hf2G3eTys=/0x0/filters:format(jpeg)/pic587442.jpg" alt="Carcassonne: Wheel of Fortune">
             
@@ -396,14 +569,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/m6269wyfWVa7gZp3oXKx6A__original/img/ZSDgydHuIZpyrZaVL1F7Lepi3h0=/0x0/filters:format(jpeg)/pic3328521.jpg" alt="Escape: The Curse of the Temple">
             
@@ -421,14 +594,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/_-xE50UDfiKwU4FZIokBag__original/img/L7S-M53m-otbtqrzgTdqtyv35uk=/0x0/filters:format(jpeg)/pic5612597.jpg" alt="Escape Room: The Game – Virtual Reality">
             
@@ -446,14 +619,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334440716" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334440716" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/5RHnNYBqmNXYvDtIeJw3pA__original/img/mD1qqRY_sjE0G6ojCQwy_mkErHY=/0x0/filters:format(jpeg)/pic403502.jpg" alt="Animal Upon Animal">
             
@@ -471,19 +644,19 @@
                     
                     <div class="listing">
                         <span>€5.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€5.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/JgAkEBUaiHOsOS94iRMs2w__original/img/H5d4I5z_HSpPEu7EAl0DqLt9_pM=/0x0/filters:format(jpeg)/pic646458.jpg" alt="Forbidden Island">
             
@@ -501,14 +674,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/YuKNsvUphYmdYnI4y1wzcA__original/img/1n1CxLa7Y6yxIkWZkPVB50lWhOo=/0x0/filters:format(jpeg)/pic829703.jpg" alt="Lino">
             
@@ -526,14 +699,14 @@
                     
                     <div class="listing">
                         <span>€7.50 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334547007" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334547007" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/EnnjrNCEdBVAvkKomHLV_Q__original/img/31PbR5svHmtvVPT7IFOtvr4SLwc=/0x0/filters:format(jpeg)/pic852332.jpg" alt="Kuhhandel Master">
             
@@ -551,14 +724,14 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/79RZDVvvjXijQYFLnntAcA__original/img/jEpv6RQ4e7QxC84lqJoLqCyfF48=/0x0/filters:format(png)/pic5647237.png" alt="Carcassonne Junior">
             
@@ -576,24 +749,24 @@
                     
                     <div class="listing">
                         <span>€5.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334800320" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334800320" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-14T00:00:00">
             
             <img src="https://cf.geekdo-images.com/NxzxMSGrXnhZHEQc_1_zfQ__original/img/PqjOV4zujhvuAohuS5NsyNgo06I=/0x0/filters:format(jpeg)/pic5471628.jpg" alt="Bandida">
             
@@ -611,14 +784,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2333995186" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2333995186" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/t2L_dlodn04yyS7CmwnREQ__original/img/HmP2e4IuZWEWpG56C08zYnvBFvU=/0x0/filters:format(jpeg)/pic4741220.jpg" alt="Catan: Junior">
             
@@ -636,14 +809,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/_lI2eUDHfesfe5SswJiFAg__original/img/H4XHVffQ4SOxgWoG396I9LUrwg8=/0x0/filters:format(png)/pic4783831.png" alt="Machi Koro">
             
@@ -661,14 +834,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/5t7Ok2VkRAoWdfTgELmorg__original/img/HcF3MVDXXSbANqpHs6JVWtkaEeY=/0x0/filters:format(jpeg)/pic5015144.jpg" alt="La Casa de Papel Escape Game">
             
@@ -686,14 +859,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/_-eHW9MfHjAClQpKkX1kMw__original/img/pGifC_XmjiKh4OI_N4DHBGt5CcQ=/0x0/filters:format(png)/pic6097313.png" alt="Throw Throw Burrito">
             
@@ -711,14 +884,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334537599" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334537599" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/0vJwP6NGa7GHPZKC3gplUw__original/img/TJDCd-PYySXmhQn-LC-y88JPA7U=/0x0/filters:format(jpeg)/pic3989824.jpg" alt="Saboteur">
             
@@ -736,14 +909,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/yOWJiLykXC5RfOgRukdoKQ__original/img/_eNX4a7ff8nve2H2xeXbZeGIkdk=/0x0/filters:format(jpeg)/pic3524881.jpg" alt="SET">
             
@@ -761,19 +934,19 @@
                     
                     <div class="listing">
                         <span>€12.50 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334423113" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334423113" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/TXRySQoktRRuwCl8pxeTsA__original/img/95lYxG11cLJ-z8e2tLEVX794mHE=/0x0/filters:format(jpeg)/pic3488257.jpg" alt="Katamino">
             
@@ -791,14 +964,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/qpL225YNN5iKRPotB7Q7MA__original/img/5ZGo501PquASeGxpQLBIglcVSYs=/0x0/filters:format(jpeg)/pic6173371.jpg" alt="Labyrinth">
             
@@ -816,14 +989,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/LeaLDlTTmeN639MfuflcMw__original/img/fusGQFpm4srwqhM8CDlEDzh0NyQ=/0x0/filters:format(jpeg)/pic2286966.jpg" alt="Rummikub">
             
@@ -841,24 +1014,24 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€5.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334802715" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334802715" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/OBo58xAV1JONdkpg_s27pw__original/img/wNWmHS2kSEclNeZXLI6DxpCG36k=/0x0/filters:format(jpeg)/pic992787.jpg" alt="Tier auf Tier: Das Duell">
             
@@ -876,14 +1049,14 @@
                     
                     <div class="listing">
                         <span>€5.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334834714" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/ri8mcs_j26dGRxA5e2xITQ__original/img/GXYPgz5YtPcAfdXkNrMudhqzY3g=/0x0/filters:format(jpeg)/pic4496800.jpg" alt="Saboteur: The Lost Mines">
             
@@ -901,14 +1074,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/mVmmntn2oQd0PfFrWBvwIQ__original/img/11jrKPiOVTNl5NwX83KGtTZEq40=/0x0/filters:format(jpeg)/pic404651.jpg" alt="Scrabble">
             
@@ -926,14 +1099,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/OoyGKsAW0tMmBrUFDHOI5A__original/img/Clgd5u0x07d2aFe40KG4AkX6tbs=/0x0/filters:format(jpeg)/pic73047.jpg" alt="Sherlock">
             
@@ -951,14 +1124,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/C0d6NW6cvL8X9P5YsGlabg__original/img/u2gwKLffYsysCtXZKKbKzRlqcCY=/0x0/filters:format(jpeg)/pic318943.jpg" alt="Boggle">
             
@@ -976,14 +1149,14 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/vjh8giTKKXKJqopc8yvrGg__original/img/cO_6ep9I8F1DCwbbPTTej6eigfc=/0x0/filters:format(png)/pic3056060.png" alt="De Mol">
             
@@ -1001,14 +1174,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Terwolde</span>
-                        <a href="https://link.marktplaats.nl/m2334460200" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334460200" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/LzsXWOG6ZA6x6TqB5H6F1g__original/img/TEhzaXq8jDbULdOBhC2FxdI2dr8=/0x0/filters:format(jpeg)/pic3488252.jpg" alt="Panic Lab">
             
@@ -1026,14 +1199,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/aZN8c8XyssNJSPtaEQ3i_w__original/img/tAAb4wJZuJp6sfjap1byLmcv8EY=/0x0/filters:format(jpeg)/pic872066.jpg" alt="War on Terror">
             
@@ -1051,14 +1224,14 @@
                     
                     <div class="listing">
                         <span>€20.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334656716" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334656716" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/-pwShxFPJWrxye8o193e-w__original/img/QVz5wc68n_jsB3OcsANsZdZLpw0=/0x0/filters:format(jpeg)/pic374320.jpg" alt="Lords of Creation">
             
@@ -1076,14 +1249,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/CjuAaK8GeoHtoHt1VRGsJQ__original/img/LE9Bmqn1W9q-ENMAUbOWxe4_aj0=/0x0/filters:format(jpeg)/pic1281370.jpg" alt="Olympicards">
             
@@ -1101,14 +1274,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/O3JZyf9nB_2tGl4jpj8SPw__original/img/34QfBCivHif7R6G3MTj-CUJRUAE=/0x0/filters:format(jpeg)/pic25644.jpg" alt="Stratego">
             
@@ -1126,19 +1299,19 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€5.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334800241" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334800241" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/x2aXf3_FVP8Phkm9L1nppA__original/img/KymnsNqSdPJbd7MKSsZXbRPjmXU=/0x0/filters:format(jpeg)/pic33318.jpg" alt="Spooks">
             
@@ -1156,14 +1329,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/-BRJ4CgluqC8BC9Ksj6x9Q__original/img/gNBfACdjt8Jf31UN65YQ3jdF9p4=/0x0/filters:format(jpeg)/pic1434796.jpg" alt="Taxi!">
             
@@ -1181,14 +1354,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/nsWjsuTA5BN5oXiOyS2VJg__original/img/Tzlvv7pKWPIw0UOOpNSt-UHuicE=/0x0/filters:format(jpeg)/pic2365477.jpg" alt="Qwirkle Cards">
             
@@ -1206,14 +1379,14 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/Rvu1UIrmRwpfA3TPB8gMQg__original/img/XtvUXTworDGm-D1HA9ubQPxullo=/0x0/filters:format(jpeg)/pic302117.jpg" alt="Kalah">
             
@@ -1231,14 +1404,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334235759" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334235759" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-14T00:00:00">
             
             <img src="https://cf.geekdo-images.com/OAZVkxSo77uePwyKAhC7cA__original/img/UCIm5UBfQLINQdz8McLBFTi6Kqg=/0x0/filters:format(jpeg)/pic1204662.jpg" alt="Party & Co: Original">
             
@@ -1256,14 +1429,14 @@
                     
                     <div class="listing">
                         <span>€15.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334045943" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334045943" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/z-DnsBlUekkyC9X5NMfdVw__original/img/oyijIK3JcRF3IHsUV7VxljhLXj8=/0x0/filters:format(jpeg)/pic3652034.jpg" alt="Fast Forward: FLEE">
             
@@ -1281,14 +1454,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/e7Rf5P25z7JCSEIcfn_sYw__original/img/R2AeZkr5jN7uX_M3u26mO8b52rE=/0x0/filters:format(jpeg)/pic470544.jpg" alt="Hotel Amsterdam">
             
@@ -1306,14 +1479,14 @@
                     
                     <div class="listing">
                         <span>€10.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334528645" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334528645" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/kxYYgRlwM1NbHJHp62FLqg__original/img/qcX-WQOIYLo4QzT3DkJT8wN7U90=/0x0/filters:format(jpeg)/pic458934.jpg" alt="Halli Galli">
             
@@ -1331,14 +1504,14 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/owlmDA10KegcwPaapY5auw__original/img/JJ5Pw1-6M7GUZ7OhFxEybSaryiM=/0x0/filters:format(png)/pic5146918.png" alt="Clue">
             
@@ -1356,14 +1529,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/YH5C06snaoJtDqKjwMROPw__original/img/gB1mfMGbSkXgYxU5FA4QWForCZk=/0x0/filters:format(jpeg)/pic5140451.jpg" alt="Jenga">
             
@@ -1381,14 +1554,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Terwolde</span>
-                        <a href="https://link.marktplaats.nl/m2334463805" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334463805" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/EHNMggRRThMqhOG2qoRoVA__original/img/ZzlYr_j7yAsWMUeC3Fk51yaK7Sg=/0x0/filters:format(jpeg)/pic194107.jpg" alt="Bakerstreet">
             
@@ -1406,14 +1579,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-14T00:00:00">
             
             <img src="https://cf.geekdo-images.com/xTlPcUzqDC3HEG35e1MsfA__original/img/2IzQGrOKIK9KcYvpuLgTprdLVB8=/0x0/filters:format(jpeg)/pic97241.jpg" alt="Party & Co">
             
@@ -1431,19 +1604,19 @@
                     
                     <div class="listing">
                         <span>€15.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334046647" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334046647" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€15.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334046647" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334046647" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/1a2J7hKt17Qob_UnMwRf9Q__original/img/hvKLhrp4eysa5SlvRhR84j7uvAE=/0x0/filters:format(jpeg)/pic4496650.jpg" alt="Hochspannung">
             
@@ -1461,14 +1634,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/LhVApCCEf-KTHT8MZiYfew__original/img/spo14DOpTuee7DkF4EBFoVDgsg4=/0x0/filters:format(jpeg)/pic702712.jpg" alt="Halli Galli Junior">
             
@@ -1486,19 +1659,19 @@
                     
                     <div class="listing">
                         <span>€7.50 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334809381" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334809381" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/QGDgWIYdddQupkgdBcnpdw__original/img/IlVFZGjzu3zN19Z0vY2TiB2c4gA=/0x0/filters:format(jpeg)/pic1405470.jpg" alt="Speed">
             
@@ -1516,14 +1689,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/ivIxPIt2JBz6wKDLNmwJOQ__original/img/ei4j6N_UX42MZya2_R3_8rHGlbk=/0x0/filters:format(jpeg)/pic705420.jpg" alt="Eldorado">
             
@@ -1541,14 +1714,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/noTF4551BIkxckNOyBCtRQ__original/img/DzC3pYWJK-bEFPiiYbwzTPii0iU=/0x0/filters:format(jpeg)/pic4346774.jpg" alt="Clickbait">
             
@@ -1566,14 +1739,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/yER_W1PbMuTqGXaliCKggg__original/img/pGpQtHTYLFRqPPohTn763lTK5QU=/0x0/filters:format(jpeg)/pic392301.jpg" alt="Tri-Ominos">
             
@@ -1591,29 +1764,29 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€25.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334813829" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€6.00 in Colmschate</span>
-                        <a href="https://link.marktplaats.nl/m2334805753" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334805753" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€9.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334439707" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334439707" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/m-ACyDV7uoagnDmMZ1PzjQ__original/img/DcJ3R8kH5esEf_40_MPdnDooR2Y=/0x0/filters:format(png)/pic3043211.png" alt="Expeditie Robinson">
             
@@ -1631,14 +1804,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334537857" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334537857" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/oMJ0w0TsaIqTwhZ3ZBCKNw__original/img/zqQF3xvJVcDiFDy-HOP1hK6rsYM=/0x0/filters:format(jpeg)/pic387612.jpg" alt="Trivial Pursuit: Genus Edition">
             
@@ -1656,14 +1829,14 @@
                     
                     <div class="listing">
                         <span>€5.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334435559" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334435559" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/LX1JS3zaXDMGHU--fo8YQQ__original/img/dwcTAtPWRx1di9lMsYr7QGbgoMU=/0x0/filters:format(png)/pic1030020.png" alt="Party & Co: Junior">
             
@@ -1681,14 +1854,14 @@
                     
                     <div class="listing">
                         <span>€7.00 in Gorssel</span>
-                        <a href="https://link.marktplaats.nl/m2334433587" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334433587" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/Wqd4ybeLJSkOf9MwCK3pSw__original/img/Kyworbfmf99Ur2LZJqky5CI9zi4=/0x0/filters:format(jpeg)/pic587489.jpg" alt="20000 Mijlen onder zee">
             
@@ -1706,14 +1879,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/IPF4n0gDM9q_kQtm1lXSuw__original/img/DZywdqPfexnVPAMZ_i_nyLf3Co4=/0x0/filters:format(jpeg)/pic1430318.jpg" alt="High Five!">
             
@@ -1731,14 +1904,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/vDo4qdmjMC0KqHEVuahGng__original/img/bXCjKGJKD0ds_ghWrfSm3wG_WZ4=/0x0/filters:format(jpeg)/pic286567.jpg" alt="Memory">
             
@@ -1756,14 +1929,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/-a71s7lPy1YRa3mPOM9k2A__original/img/1TZFIArn5Qt1PhaP8OqloongcPQ=/0x0/filters:format(jpeg)/pic2737023.jpg" alt="Twister">
             
@@ -1781,14 +1954,14 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334659057" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/2vry27Dm6GCFt8OGAalMEg__original/img/bDrqsIhxttpnlHyh1fWdhM99LbI=/0x0/filters:format(jpeg)/pic423923.jpg" alt="Let's Go Fishin'">
             
@@ -1806,14 +1979,14 @@
                     
                     <div class="listing">
                         <span>€5.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334687995" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334687995" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__original/img/bA8irydTCNlE38QSzM9EhcUIuNU=/0x0/filters:format(jpeg)/pic5786795.jpg" alt="Monopoly">
             
@@ -1831,49 +2004,49 @@
                     
                     <div class="listing">
                         <span>€30.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334018465" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334018465" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€35.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334160526" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334160526" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€4.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334815466" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334815466" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€35.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334161993" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334161993" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€0.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334829049" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                     <div class="listing">
                         <span>€10.00 in Schalkhaar</span>
-                        <a href="https://link.marktplaats.nl/m2334022366" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334022366" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-15T00:00:00">
             
             <img src="https://cf.geekdo-images.com/j-RVwMSItkJHFCFD8BFNuA__original/img/pZ9UBl40Q2V3WUquUgM17m5g8Os=/0x0/filters:format(jpeg)/pic3028363.jpg" alt="Monopoly Junior">
             
@@ -1891,14 +2064,14 @@
                     
                     <div class="listing">
                         <span>€0.00 in Olst</span>
-                        <a href="https://link.marktplaats.nl/m2334439311" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334439311" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
             </div>
         </div>
         
-        <div class="game-card">
+        <div class="game-card" data-newest-listing-date="2025-11-16T00:00:00">
             
             <img src="https://cf.geekdo-images.com/ufcv6aHCgPd01U-sygxxlQ__original/img/wHoBLlPCVXZvv61t_kywE7AKTfg=/0x0/filters:format(jpeg)/pic2624584.jpg" alt="Anti-Monopoly">
             
@@ -1916,7 +2089,7 @@
                     
                     <div class="listing">
                         <span>€12.00 in Deventer</span>
-                        <a href="https://link.marktplaats.nl/m2334673689" target="_blank" rel="noopener noreferrer">View on Marktplaats</a>
+                        <a href="https://link.marktplaats.nl/m2334673689" target="_blank" rel="noopener noreferrer">View</a>
                     </div>
                     
                 </div>
@@ -1925,7 +2098,81 @@
         
     </main>
     <footer>
-        <p>Last updated: 2025-11-16 16:49:22 UTC</p>
+        <p>Last updated: 2025-11-16 19:59:25 UTC</p>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const timeFilterButtons = document.querySelectorAll('.filter-group button[data-days]');
+            const sizeToggleButton = document.getElementById('size-toggle');
+            const gameContainer = document.getElementById('game-container');
+            const gameCards = document.querySelectorAll('.game-card');
+
+            const TIME_FILTER_KEY = 'boardgamefinder_timefilter';
+            const VIEW_SIZE_KEY = 'boardgamefinder_viewsize';
+            const DEFAULT_TIME_FILTER = '7'; // Past week
+            const DEFAULT_VIEW_SIZE = 'large';
+
+            function applyTimeFilter(days) {
+                const now = new Date();
+                const cutoff = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+
+                gameCards.forEach(card => {
+                    const listingDateStr = card.dataset.newestListingDate;
+                    if (listingDateStr) {
+                        const listingDate = new Date(listingDateStr);
+                        if (listingDate >= cutoff) {
+                            card.classList.remove('hidden');
+                        } else {
+                            card.classList.add('hidden');
+                        }
+                    }
+                });
+
+                timeFilterButtons.forEach(button => {
+                    if (button.dataset.days === days) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+            }
+
+            function applyViewSize(size) {
+                if (size === 'small') {
+                    gameContainer.classList.add('view-small');
+                } else {
+                    gameContainer.classList.remove('view-small');
+                }
+            }
+
+            // Event Listeners
+            timeFilterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const days = button.dataset.days;
+                    localStorage.setItem(TIME_FILTER_KEY, days);
+                    applyTimeFilter(days);
+                });
+            });
+
+            sizeToggleButton.addEventListener('click', () => {
+                const isSmall = gameContainer.classList.contains('view-small');
+                const newSize = isSmall ? 'large' : 'small';
+                localStorage.setItem(VIEW_SIZE_KEY, newSize);
+                applyViewSize(newSize);
+            });
+            
+            // Initial Setup
+            function initialize() {
+                const savedTimeFilter = localStorage.getItem(TIME_FILTER_KEY) || DEFAULT_TIME_FILTER;
+                const savedViewSize = localStorage.getItem(VIEW_SIZE_KEY) || DEFAULT_VIEW_SIZE;
+
+                applyTimeFilter(savedTimeFilter);
+                applyViewSize(savedViewSize);
+            }
+
+            initialize();
+        });
+    </script>
 </body>
 </html>
