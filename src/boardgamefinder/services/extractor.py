@@ -28,6 +28,8 @@ class JsonNameExtractor(NameExtractor):
                 continue
             llm_name = str(item.get("llm_name", "")).strip()
             llm_lang = str(item.get("llm_lang", "unknown")).strip().lower()
+            if llm_lang not in ["nl", "en", "unknown"]:
+                llm_lang = "unknown"
             if llm_name: # Only include items with a name
                 out.append({"llm_name": llm_name, "llm_lang": llm_lang})
         return out
