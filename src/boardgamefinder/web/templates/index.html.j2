@@ -18,6 +18,7 @@
             --accent-gradient: linear-gradient(to right, #58A6FF, #A371F7);
             --shadow-color: rgba(0, 0, 0, 0.4);
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --grid-columns: 4; /* Default column count for desktop */
         }
 
         *, *::before, *::after {
@@ -34,7 +35,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 1rem auto;
             padding: 0 1rem;
         }
@@ -64,7 +65,7 @@
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 0.75rem;
+            gap: 1.5rem; /* Increased gap */
             margin-bottom: 3rem;
             padding: 1rem;
             background-color: rgba(22, 27, 34, 0.8);
@@ -76,13 +77,19 @@
             z-index: 10;
         }
 
-        .controls strong {
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .control-group strong {
             margin-right: 0.5rem;
             color: var(--text-secondary);
             font-weight: 500;
         }
 
-        .controls button {
+        .control-group button {
             background-color: transparent;
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
@@ -94,12 +101,12 @@
             transition: all 0.2s ease-in-out;
         }
 
-        .controls button:hover {
+        .control-group button:hover {
             border-color: var(--accent-primary);
             color: var(--accent-primary);
         }
 
-        .controls button.active {
+        .control-group button.active {
             background: var(--accent-gradient);
             color: white;
             border-color: transparent;
@@ -108,7 +115,7 @@
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(var(--grid-columns), 1fr);
             gap: 2rem;
         }
 
@@ -241,7 +248,14 @@
             text-align: center;
             grid-column: 1 / -1;
         }
-
+        
+        /* Responsive Overrides */
+        @media (max-width: 1200px) {
+            :root { --grid-columns: 3; }
+        }
+        @media (max-width: 900px) {
+            :root { --grid-columns: 2; }
+        }
         @media (max-width: 600px) {
             body { padding: 1rem 0.5rem; }
             .container { padding: 0 0.5rem; }
@@ -249,8 +263,9 @@
             .controls { 
                 flex-direction: column;
                 position: static;
+                gap: 1rem;
             }
-            .game-grid { grid-template-columns: 1fr; }
+            :root { --grid-columns: 1; }
         }
     </style>
 </head>
@@ -262,13 +277,22 @@
         </header>
 
         <div class="controls">
-            <strong>Added:</strong>
-            <button data-hours="12">12 hours</button>
-            <button data-hours="24">1 day</button>
-            <button data-hours="72">3 days</button>
-            <button data-hours="168">1 week</button>
-            <button data-hours="336">2 weeks</button>
-            <button data-hours="720">1 month</button>
+            <div class="control-group">
+                <strong>Added:</strong>
+                <button data-hours="12">12h</button>
+                <button data-hours="24">1d</button>
+                <button data-hours="72">3d</button>
+                <button data-hours="168">1w</button>
+                <button data-hours="336">2w</button>
+                <button data-hours="720">1m</button>
+            </div>
+            <div class="control-group">
+                <strong>Columns:</strong>
+                <button data-columns="2">2</button>
+                <button data-columns="3">3</button>
+                <button data-columns="4">4</button>
+                <button data-columns="5">5</button>
+            </div>
         </div>
 
         <main id="game-container" class="game-grid">
@@ -316,11 +340,18 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const timeFilterButtons = document.querySelectorAll('.controls button[data-hours]');
+            // --- Constants ---
+            const timeFilterButtons = document.querySelectorAll('.control-group button[data-hours]');
+            const columnButtons = document.querySelectorAll('.control-group button[data-columns]');
             const gameCards = document.querySelectorAll('.game-card');
-            const TIME_FILTER_KEY = 'boardgamefinder_timefilter_hours';
-            const DEFAULT_TIME_FILTER = '168';
+            const root = document.documentElement;
 
+            const TIME_FILTER_KEY = 'boardgamefinder_timefilter_hours';
+            const COLUMN_KEY = 'boardgamefinder_columns';
+            const DEFAULT_TIME_FILTER = '168';
+            const DEFAULT_COLUMNS = '4';
+
+            // --- Filter Functions ---
             function applyTimeFilter(hours) {
                 const nowUtc = new Date().getTime();
                 const cutoffUtc = nowUtc - (parseFloat(hours) * 60 * 60 * 1000);
@@ -336,6 +367,14 @@
                 });
             }
 
+            function applyColumnLayout(columns) {
+                root.style.setProperty('--grid-columns', columns);
+                columnButtons.forEach(button => {
+                    button.classList.toggle('active', button.dataset.columns === columns);
+                });
+            }
+
+            // --- Event Listeners ---
             timeFilterButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const hours = button.dataset.hours;
@@ -343,11 +382,26 @@
                     applyTimeFilter(hours);
                 });
             });
+
+            columnButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const columns = button.dataset.columns;
+                    localStorage.setItem(COLUMN_KEY, columns);
+                    applyColumnLayout(columns);
+                });
+            });
             
+            // --- Initialization on Page Load ---
             function initialize() {
+                // Time Filter
                 const savedTimeFilter = localStorage.getItem(TIME_FILTER_KEY) || DEFAULT_TIME_FILTER;
-                const activeFilterButton = document.querySelector(`.controls button[data-hours="${savedTimeFilter}"]`);
-                applyTimeFilter(activeFilterButton ? savedTimeFilter : DEFAULT_TIME_FILTER);
+                const activeTimeFilter = document.querySelector(`.control-group button[data-hours="${savedTimeFilter}"]`);
+                applyTimeFilter(activeTimeFilter ? savedTimeFilter : DEFAULT_TIME_FILTER);
+
+                // Column Layout
+                const savedColumns = localStorage.getItem(COLUMN_KEY) || DEFAULT_COLUMNS;
+                const activeColumnButton = document.querySelector(`.control-group button[data-columns="${savedColumns}"]`);
+                applyColumnLayout(activeColumnButton ? savedColumns : DEFAULT_COLUMNS);
             }
 
             initialize();
