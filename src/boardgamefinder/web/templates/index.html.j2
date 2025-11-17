@@ -18,7 +18,8 @@
             --accent-gradient: linear-gradient(to right, #58A6FF, #A371F7);
             --shadow-color: rgba(0, 0, 0, 0.4);
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --grid-columns: 4; /* Default column count for desktop */
+            /* New variable for item size */
+            --grid-item-min-width: 300px; /* Default minimum width */
         }
 
         *, *::before, *::after {
@@ -35,7 +36,7 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1800px; /* Increased max-width for better auto-scaling */
             margin: 1rem auto;
             padding: 0 1rem;
         }
@@ -65,7 +66,7 @@
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1.5rem; /* Increased gap */
+            gap: 1.5rem;
             margin-bottom: 3rem;
             padding: 1rem;
             background-color: rgba(22, 27, 34, 0.8);
@@ -87,23 +88,34 @@
             margin-right: 0.5rem;
             color: var(--text-secondary);
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .control-group button {
             background-color: transparent;
             color: var(--text-secondary);
             border: 1px solid var(--border-color);
-            padding: 0.5rem 1.2rem;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1.1rem; /* Larger font for + and - */
             font-weight: 500;
             transition: all 0.2s ease-in-out;
+            min-width: 44px; /* Best practice for touch targets */
+            min-height: 44px;
+            line-height: 1;
         }
 
         .control-group button:hover {
             border-color: var(--accent-primary);
             color: var(--accent-primary);
+        }
+        
+        .control-group button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--border-color);
+            color: var(--text-secondary);
         }
 
         .control-group button.active {
@@ -115,7 +127,8 @@
 
         .game-grid {
             display: grid;
-            grid-template-columns: repeat(var(--grid-columns), 1fr);
+            /* Auto-scaling grid implementation */
+            grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-min-width), 1fr));
             gap: 2rem;
         }
 
@@ -249,13 +262,7 @@
             grid-column: 1 / -1;
         }
         
-        /* Responsive Overrides */
-        @media (max-width: 1200px) {
-            :root { --grid-columns: 3; }
-        }
-        @media (max-width: 900px) {
-            :root { --grid-columns: 2; }
-        }
+        /* Responsive Overrides Simplified */
         @media (max-width: 600px) {
             body { padding: 1rem 0.5rem; }
             .container { padding: 0 0.5rem; }
@@ -263,9 +270,8 @@
             .controls { 
                 flex-direction: column;
                 position: static;
-                gap: 1rem;
+                gap: 1.5rem; /* Increased gap for better spacing */
             }
-            :root { --grid-columns: 1; }
         }
     </style>
 </head>
@@ -280,18 +286,17 @@
             <div class="control-group">
                 <strong>Added:</strong>
                 <button data-hours="12">12h</button>
-                <button data-hours="24">1d</button>
+                <button data-hours="24" class="active">1d</button>
                 <button data-hours="72">3d</button>
                 <button data-hours="168">1w</button>
                 <button data-hours="336">2w</button>
                 <button data-hours="720">1m</button>
             </div>
+            <!-- New controls for item size -->
             <div class="control-group">
-                <strong>Columns:</strong>
-                <button data-columns="2">2</button>
-                <button data-columns="3">3</button>
-                <button data-columns="4">4</button>
-                <button data-columns="5">5</button>
+                <strong>Item Size:</strong>
+                <button id="decrease-size" aria-label="Decrease item size">-</button>
+                <button id="increase-size" aria-label="Increase item size">+</button>
             </div>
         </div>
 
@@ -342,36 +347,63 @@
         document.addEventListener('DOMContentLoaded', () => {
             // --- Constants ---
             const timeFilterButtons = document.querySelectorAll('.control-group button[data-hours]');
-            const columnButtons = document.querySelectorAll('.control-group button[data-columns]');
             const gameCards = document.querySelectorAll('.game-card');
             const root = document.documentElement;
+            const increaseButton = document.getElementById('increase-size');
+            const decreaseButton = document.getElementById('decrease-size');
 
             const TIME_FILTER_KEY = 'boardgamefinder_timefilter_hours';
-            const COLUMN_KEY = 'boardgamefinder_columns';
-            const DEFAULT_TIME_FILTER = '168';
-            const DEFAULT_COLUMNS = '4';
+            const ITEM_SIZE_KEY = 'boardgamefinder_itemsize_px';
+
+            const DEFAULT_TIME_FILTER = '24';
+            const DEFAULT_ITEM_SIZE = 300;
+            const MIN_ITEM_SIZE = 220; // Reasonable minimum size
+            const MAX_ITEM_SIZE = 450; // Reasonable maximum size
+            const SIZE_STEP = 20; // Px to change on each click
 
             // --- Filter Functions ---
             function applyTimeFilter(hours) {
                 const nowUtc = new Date().getTime();
                 const cutoffUtc = nowUtc - (parseFloat(hours) * 60 * 60 * 1000);
+                let visibleCount = 0;
                 gameCards.forEach(card => {
                     const listingDateStr = card.dataset.newestListingDate;
                     if (listingDateStr) {
                         const listingDateUtc = new Date(listingDateStr).getTime();
-                        card.classList.toggle('hidden', listingDateUtc < cutoffUtc);
+                        const isVisible = listingDateUtc >= cutoffUtc;
+                        card.classList.toggle('hidden', !isVisible);
+                        if (isVisible) visibleCount++;
                     }
                 });
+
+                // Handle 'no games' message
+                const noGamesMessage = document.querySelector('.no-games');
+                if(noGamesMessage) {
+                    noGamesMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+                }
+
                 timeFilterButtons.forEach(button => {
                     button.classList.toggle('active', button.dataset.hours === hours);
                 });
             }
 
-            function applyColumnLayout(columns) {
-                root.style.setProperty('--grid-columns', columns);
-                columnButtons.forEach(button => {
-                    button.classList.toggle('active', button.dataset.columns === columns);
-                });
+            // --- Item Size Functions ---
+            function applyItemSize(size) {
+                const newSize = Math.max(MIN_ITEM_SIZE, Math.min(size, MAX_ITEM_SIZE));
+                root.style.setProperty('--grid-item-min-width', `${newSize}px`);
+                localStorage.setItem(ITEM_SIZE_KEY, newSize);
+                updateSizeButtons(newSize);
+            }
+            
+            function updateSizeButtons(currentSize) {
+                decreaseButton.disabled = currentSize <= MIN_ITEM_SIZE;
+                increaseButton.disabled = currentSize >= MAX_ITEM_SIZE;
+            }
+
+            function changeItemSize(direction) {
+                const currentSize = parseFloat(getComputedStyle(root).getPropertyValue('--grid-item-min-width'));
+                const newSize = currentSize + (SIZE_STEP * direction);
+                applyItemSize(newSize);
             }
 
             // --- Event Listeners ---
@@ -382,26 +414,19 @@
                     applyTimeFilter(hours);
                 });
             });
-
-            columnButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const columns = button.dataset.columns;
-                    localStorage.setItem(COLUMN_KEY, columns);
-                    applyColumnLayout(columns);
-                });
-            });
             
+            increaseButton.addEventListener('click', () => changeItemSize(1)); // 1 for increase
+            decreaseButton.addEventListener('click', () => changeItemSize(-1)); // -1 for decrease
+
             // --- Initialization on Page Load ---
             function initialize() {
                 // Time Filter
                 const savedTimeFilter = localStorage.getItem(TIME_FILTER_KEY) || DEFAULT_TIME_FILTER;
-                const activeTimeFilter = document.querySelector(`.control-group button[data-hours="${savedTimeFilter}"]`);
-                applyTimeFilter(activeTimeFilter ? savedTimeFilter : DEFAULT_TIME_FILTER);
+                applyTimeFilter(savedTimeFilter);
 
-                // Column Layout
-                const savedColumns = localStorage.getItem(COLUMN_KEY) || DEFAULT_COLUMNS;
-                const activeColumnButton = document.querySelector(`.control-group button[data-columns="${savedColumns}"]`);
-                applyColumnLayout(activeColumnButton ? savedColumns : DEFAULT_COLUMNS);
+                // Item Size
+                const savedItemSize = localStorage.getItem(ITEM_SIZE_KEY) || DEFAULT_ITEM_SIZE;
+                applyItemSize(parseFloat(savedItemSize));
             }
 
             initialize();
